@@ -14,37 +14,25 @@ Every note belongs to a **colour-coded category**, and a built-in toolkit lets *
 | `src/*.css`, `src/pixel-scene.js` | Theme sources. `pixel-scene.js` draws the pixel scene (sprite Tengen, roof, skyline, fireworks) as animated SVG |
 | `plugins/dataview/` | Dataview, copied from your DND vault; the installer enables it |
 | `tools/vault.js` | Zero-dependency Node tool: build theme, install, scaffold, hubs, new note, normalize, **autolink**, **check** |
-| `snippets/` | `live-fireworks` (the animation on/off switch, generated), plus optional `no-scene`, `bright-scene`, `readable-mode` |
+| `snippets/` | `live-fireworks` + `hide-*` panel switches (generated), plus `no-scene`, `bright-scene`, `readable-mode` |
+| `FRIEND-SETUP.md`, `install.sh`, `install.bat` | the friend-facing guide and one-step installers |
 | `templates/vault-CLAUDE.md` | The instructions installed into a vault so its Claude knows the rules |
 | `starter-vault/` | A ready-to-open sample vault: 62 Demon Slayer notes, 10 hubs, ~960 internal links, zero broken links |
 
-## Install into your friend's vault (recommended)
+## Getting it to a friend
 
-Needs Node 16+ (Claude Code users already have it).
+**Easiest: send the zip.** `Tengen-Pixel-Kit.zip` contains everything; the friend follows `FRIEND-SETUP.md` (back up, install Node, double-click `install.bat` / run `./install.sh`, reload Obsidian). The repo is private, so a `git clone` only works if you add them under GitHub → Settings → Collaborators; otherwise use the zip.
 
-```bash
-git clone https://github.com/wilburnya80/Obsidian-Cosmetic-Changes-.git
-cd Obsidian-Cosmetic-Changes-
-git checkout claude/kind-ritchie-gw1wti       # until it is merged
-node tools/vault.js install "/path/to/his/vault"
-```
+### What the installer changes (SAFE mode, the default)
+`node tools/vault.js install "/path/to/vault"` **never creates, moves, renames or edits a note or folder.** It adds the theme, CSS snippets, an `appearance.json`/`graph.json` update (existing graph groups and settings are kept), a hidden `.tengen/` toolkit with backups, and a `CLAUDE.md` for Claude (appended if one exists). Your own top-level folders become the colour categories. No plugins unless `--with-dataview`; hotkeys only with `--with-hotkeys`. Verified on a copy of a 2,500-note D&D vault: every file byte-identical after install.
 
-That installs the theme and sets it active, installs and enables the Dataview plugin (Obsidian asks once to turn on community plugins), enables per-category link colours, colours the graph view, drops the toolkit in a hidden `.tengen/` folder, writes (or merges into) the vault's `CLAUDE.md`, and creates the category folders plus hub notes. **It does not move, edit or delete any existing note.** Original `appearance.json`/`graph.json`/`CLAUDE.md` are backed up once as `*.tengen-bak`.
+The only thing that can modify notes is `autolink --write` (dry run by default): it adds `[[ ]]` around existing words, nothing else (verified: zero text or frontmatter differences on 2,492 edited notes), and `restore --write` puts every touched file back to its original.
 
-Then:
+### Switches (Settings → Appearance → CSS snippets)
+`live-fireworks`, `hide-local-graph`, `hide-backlinks`, `hide-outgoing-links`, `hide-outline`, `hide-file-properties`, `hide-right-sidebar` (all page panels), plus `bright-scene`, `readable-mode`, `no-scene`. Each is a plain on/off toggle; the panel ones hide the matching right-sidebar panel for the page you are on.
 
-```bash
-cd "/path/to/his/vault"
-claude
-```
-
-and tell Claude something like *"Follow CLAUDE.md. Dry-run `normalize` and `autolink`, show me the summary, then organise my notes into the categories."*
-
-### Manual install (theme only)
-Copy `theme.css` + `manifest.json` into `<vault>/.obsidian/themes/Tengen Pixel/`, then Settings → Appearance → Themes → pick it. (Optional: copy `snippets/*.css` into `<vault>/.obsidian/snippets/`.)
-
-### Just try it
-Open `starter-vault/` as a vault in Obsidian (*Open folder as vault*), trust the vault, and the theme is already active. Open the **Graph view** to see the colour-sorted clusters.
+### Structured starter vault (optional)
+`starter-vault/` is a ready-to-open sample (62 Demon Slayer notes, hubs, ~960 links). It is built with `install starter-vault --structured`, which *does* create category folders and hub notes. Use that mode only on a fresh vault.
 
 ## The colour system
 

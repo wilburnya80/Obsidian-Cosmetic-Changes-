@@ -14,13 +14,14 @@ This repo is an **Obsidian theme + Claude-ready vault kit** (Demon Slayer / Teng
 ## After ANY change to `src/`, `categories.json`, `tools/` or `templates/`
 ```bash
 node tools/vault.js build                 # regenerates theme.css + manifest.json (+ starter-vault theme, graph colours, link colours)
-node tools/vault.js install starter-vault # re-syncs the toolkit, CLAUDE.md, snippets into the sample vault
+node tools/vault.js install starter-vault --structured # re-syncs the toolkit, CLAUDE.md, snippets into the sample vault (structured mode ONLY for starter-vault)
 cd starter-vault && node .tengen/tools/vault.js hubs && node .tengen/tools/vault.js check   # must end RESULT: ok
 ```
 
 ## Rules
+* **Friend installs must stay SAFE**: default `install` adopts the vault's own folders and must never create/move/edit notes or folders, never install plugins/hotkeys unless flagged, back up to `.tengen/backups/` (not beside notes). Only `autolink --write` may edit notes, and only by adding `[[ ]]`. Re-verify with a copy of `dnd-game-brain`: sha256 of all non-`.obsidian` files identical after install; stripped-of-brackets text identical after autolink.
 * Look = PIXEL ART (user rejected the earlier neon/glow design). Hard borders, no rounding, block shadows, Pixelify Sans. Applies to both `.theme-dark` and `.theme-light`. Modals/menus stay opaque.
 * Obsidian themes are CSS-only — no JavaScript in the theme.
 * The scene lives in `body::before` (fixed, z-index -1, base64 SVG with SMIL animation). Keep `pointer-events: none` and the transparent-container rules in `20-chrome.css`.
-* `vault.js` commands that edit existing notes must stay **dry-run by default** and back up once (`*.tengen-bak`); the installer must never move/delete user notes.
+* `vault.js` commands that edit existing notes must stay **dry-run by default** and back up once into `.tengen/backups/`; the installer must never move/delete user notes.
 * Visual check: render `theme.css` in headless Chromium (Playwright is installed) against a mock DOM using Obsidian class names; there is no Obsidian binary in the cloud container.

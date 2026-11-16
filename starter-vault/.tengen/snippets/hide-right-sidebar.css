@@ -1,0 +1,2 @@
+/* hide-right-sidebar: ON = hides the whole right sidebar (all page panels: local graph, backlinks, outgoing links, outline, properties). OFF = shown. */
+.mod-right-split, .workspace-ribbon.mod-right, .workspace-split.mod-right-sidebar { display: none !important; }

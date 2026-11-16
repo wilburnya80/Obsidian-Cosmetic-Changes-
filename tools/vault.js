@@ -8,7 +8,11 @@
 
    Commands (anything that edits existing notes is a DRY RUN unless you pass --write):
      build                       rebuild theme.css from src/ + categories.json, regenerate graph colours + link colours
-     install <vaultPath>         install theme, snippets, tools, CLAUDE.md, graph colours, folders + hubs into a vault
+     install <vaultPath>         SAFE install into an existing vault: theme + colours + toolkit only. Your notes/folders are never touched.
+                               Adds nothing but: .obsidian theme/snippets/appearance/graph colours, hidden .tengen/, and a CLAUDE.md.
+                               --with-dataview  also install the bundled Dataview plugin     --with-hotkeys  add right-panel hotkeys
+                               --structured     (starter-vault only) create category folders + hub notes instead of adopting your folders
+                               --no-claude-md   do not create/merge CLAUDE.md
      scaffold                    create category folders, hub notes, Home and A-Z Index if missing (never touches your notes)
      hubs                        regenerate the auto-lists inside every hub, Home and the A-Z Index
      new <catId> "Title"         create a note from the template, link it into its hub  [--related "A,B"] [--summary "..."]
@@ -28,6 +32,7 @@ const CFG = JSON.parse(fs.readFileSync(path.join(ROOT, 'categories.json'), 'utf8
 const CATS = CFG.categories;
 const THEME_NAME = CFG.theme || 'Tengen Entertainment District';
 const HUB_CAT = CATS.find((c) => c.id === 'hub');
+const ADOPT = CFG.mode === 'adopt';   // adopt = colours/links only, uses the vault's own folders; structured = creates folders + hubs
 const MARK_START = '<!-- tengen:auto-start -->';
 const MARK_END = '<!-- tengen:auto-end -->';
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -55,7 +60,13 @@ function vaultDir() {
 const log = (...a) => console.log(...a);
 const read = (p) => fs.readFileSync(p, 'utf8');
 function write(p, s) { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s); }
-function backupOnce(p) { if (fs.existsSync(p) && !fs.existsSync(p + '.tengen-bak')) fs.copyFileSync(p, p + '.tengen-bak'); }
+function backupOnce(p) {
+  if (!fs.existsSync(p)) return;
+  const v = vaultDir();
+  const rel = path.relative(v, p);
+  const dest = rel && !rel.startsWith('..') && !path.isAbsolute(rel) ? path.join(v, '.tengen', 'backups', rel + '.orig') : p + '.tengen-bak';
+  if (!fs.existsSync(dest)) { fs.mkdirSync(path.dirname(dest), { recursive: true }); fs.copyFileSync(p, dest); }
+}
 
 /* ------------------------------------------------------------- colour utils */
 const hexToRgb = (h) => { const n = parseInt(h.replace('#', ''), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
@@ -141,6 +152,7 @@ function writeTheme(vault) {
 function cmdBuild() {
   const vault = vaultDir();
   write(path.join(ROOT, 'snippets', 'live-fireworks.css'), liveSnippet());
+  for (const [f, css] of Object.entries(panelSnippets())) { write(path.join(ROOT, 'snippets', f), css); if (fs.existsSync(path.join(vault, '.obsidian', 'snippets'))) write(path.join(vault, '.obsidian', 'snippets', f), css); }
   log('✔ snippets/live-fireworks.css written (the live-fireworks switch)');
   if (fs.existsSync(path.join(vault, '.obsidian', 'snippets'))) write(path.join(vault, '.obsidian', 'snippets', 'live-fireworks.css'), liveSnippet());
   if (!INSTALLED) {
@@ -241,15 +253,18 @@ const GRAPH_DEFAULTS = {
   nodeSizeMultiplier: 1.4, lineSizeMultiplier: 1.2, 'collapse-forces': true, centerStrength: 0.45, repelStrength: 12, linkStrength: 1, linkDistance: 220, scale: 0.5, close: true,
 };
 function mergeJson(file, patch, defaults = {}) {
-  let cur = {};
-  if (fs.existsSync(file)) { try { cur = JSON.parse(read(file)); } catch (e) { backupOnce(file); cur = {}; } backupOnce(file); }
-  write(file, JSON.stringify({ ...defaults, ...cur, ...patch }, null, 2) + '\n');
+  let cur = null;
+  if (fs.existsSync(file)) { backupOnce(file); try { cur = JSON.parse(read(file)); } catch (e) { cur = null; } }
+  write(file, JSON.stringify(cur ? { ...cur, ...patch } : { ...defaults, ...patch }, null, 2) + '\n');   // never add display settings to an existing graph.json
 }
 
 function cmdColors() {
   const vault = vaultDir();
-  mergeJson(path.join(vault, '.obsidian', 'graph.json'), { colorGroups: colorGroups() }, GRAPH_DEFAULTS);
-  log('✔ graph.json colour groups written (' + CATS.length + ' categories)');
+  const gfile = path.join(vault, '.obsidian', 'graph.json');
+  let existing = []; try { existing = JSON.parse(read(gfile)).colorGroups || []; } catch (e) { existing = []; }
+  const ours = colorGroups(), have = new Set(existing.map((g) => g.query));
+  mergeJson(gfile, { colorGroups: [...existing.filter((g) => !ours.some((o) => o.query === g.query)), ...ours] }, GRAPH_DEFAULTS);
+  log('✔ graph.json colour groups written (' + ours.length + ' categories; any groups you already had are kept)');
   const model = loadVault(vault);
   const per = {};
   for (const n of model.notes) {
@@ -492,7 +507,10 @@ const PROTECT = /`[^`]*`|!?\[\[[^\]]*\]\]|\[[^\]]*\]\([^)]*\)|https?:\/\/\S+|<[^
 
 function buildMatcher(model, ignore) {
   const terms = new Map(); // lower -> {note, single}
+  const titleCount = new Map();
+  for (const n of model.notes) titleCount.set(n.title.toLowerCase(), (titleCount.get(n.title.toLowerCase()) || 0) + 1);
   for (const n of model.notes) {
+    if (titleCount.get(n.title.toLowerCase()) > 1) continue;      // ambiguous title (same name in two folders): never auto-link
     if (n.cat && n.cat.id === 'hub') continue;
     for (const t of [n.title, ...n.aliases]) {
       const k = t.trim();
@@ -584,8 +602,7 @@ function cmdAutolink(quiet) {
     if (!quiet) log(`${doWrite ? '✎' : '·'} ${n.rel}: +${r.count}  (${r.examples.join(', ')}${r.count > 3 ? ', …' : ''})`);
     if (doWrite) {
       backupOnce(n.abs);
-      const head = n.fmRaw === null ? '' : `---\n${n.fmRaw}\n---\n`;
-      write(n.abs, head + r.text);
+      write(n.abs, n.text.slice(0, n.text.length - n.body.length) + r.text);   // frontmatter + line endings stay byte-identical
     }
   }
   log(`${doWrite ? '✔ added' : 'dry run — would add'} ${total} links in ${files} notes (mode: ${mode})${doWrite ? '' : '  (re-run with --write)'}`);
@@ -596,7 +613,9 @@ function cmdAutolink(quiet) {
    ====================================================================== */
 function cmdCheck() {
   const model = loadVault(vaultDir());
-  const minLinks = parseInt(ARGS['min-links'] || '6', 10);
+  const minLinks = parseInt(ARGS['min-links'] || (ADOPT ? '3' : '6'), 10);
+  const attach = new Set(); (function w(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { if (e.name.startsWith('.') || e.name === 'node_modules') continue; const p2 = path.join(d, e.name); if (e.isDirectory()) w(p2); else if (!e.name.endsWith('.md')) { attach.add(e.name.toLowerCase()); attach.add(path.relative(model.vault, p2).split(path.sep).join('/').toLowerCase()); } } })(model.vault);
+  const isAttachment = (t) => attach.has(t.toLowerCase()) || attach.has(t.split('/').pop().toLowerCase());
   const inbound = new Map(model.notes.map((n) => [n, new Set()]));
   const outbound = new Map();
   const broken = [], noHub = [], thin = [], fmProblems = [];
@@ -604,11 +623,11 @@ function cmdCheck() {
     const outs = new Set();
     for (const l of linksOf(n.text)) {
       const t = resolve(model, l.target);
-      if (!t) { broken.push(`${n.rel} → [[${l.target}]]`); continue; }
+      if (!t) { if (!isAttachment(l.target)) broken.push(`${n.rel} → [[${l.target}]]`); continue; }
       if (t !== n) { outs.add(t); inbound.get(t).add(n); }
     }
     outbound.set(n, outs);
-    if (n.cat && n.cat.id !== 'hub') {
+    if (!ADOPT && n.cat && n.cat.id !== 'hub') {
       const hub = model.byName.get(hubTitle(n.cat).toLowerCase());
       if (!hub || !outs.has(hub)) noHub.push(n.rel);
       if (outs.size < minLinks) thin.push(`${n.rel} (${outs.size})`);
@@ -622,6 +641,7 @@ function cmdCheck() {
     }
   }
   const orphans = model.notes.filter((n) => inbound.get(n).size === 0 && !/^(Home)$/.test(n.title)).map((n) => n.rel);
+  void 0;
   const uncategorised = model.notes.filter((n) => !n.cat).map((n) => n.rel);
   const matcher = buildMatcher(model, ignoreTerms());
   let unlinked = 0; const unlinkedFiles = [];
@@ -638,13 +658,13 @@ function cmdCheck() {
   };
   log(`Vault: ${model.vault}\nNotes: ${model.notes.length}   Links: ${[...outbound.values()].reduce((a, s) => a + s.size, 0)} unique note→note edges`);
   sec('Broken links', broken, 'err');
-  sec('Missing link to own category hub', noHub);
-  sec(`Under-linked notes (<${minLinks} outgoing)`, thin);
+  if (!ADOPT) sec('Missing link to own category hub', noHub);
+  if (!ADOPT) sec(`Under-linked notes (<${minLinks} outgoing)`, thin);
   sec('Orphans (nothing links to them)', orphans);
-  sec('Frontmatter gaps', fmProblems);
-  sec('Notes outside every category folder', uncategorised);
+  if (!ADOPT) sec('Frontmatter gaps', fmProblems);
+  if (!ADOPT) sec('Notes outside every category folder', uncategorised);
   sec('Unlinked mentions of other notes (run: autolink --write)', unlinkedFiles);
-  const bad = broken.length > 0 || (ARGS.strict && (noHub.length || thin.length || orphans.length || fmProblems.length || unlinked));
+  const bad = broken.length > 0 || (ARGS.strict && (orphans.length || unlinked || (!ADOPT && (noHub.length || thin.length || fmProblems.length))));
   log(bad ? '\nRESULT: needs work' : '\nRESULT: ok');
   process.exit(bad ? 1 : 0);
 }
@@ -661,89 +681,152 @@ function copyDir(src, dst, skip = () => false) {
   }
 }
 
+const ADOPT_PALETTE = ['#ff4fa0', '#ffb347', '#7fe8ff', '#9bf06a', '#b78bff', '#ff6f61', '#4ade80', '#3ea6ff', '#ffe066', '#ff8ad8', '#2ee6d6', '#d9a066', '#a855f7', '#ff9f43'];
+const slug = (t) => t.toLowerCase().replace(/^\d+[\s._-]*/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'folder';
+
+/* adopt: turn the vault's OWN top-level folders into colour categories. Creates nothing in the vault. */
+function adoptCategories(vault) {
+  const dirs = fs.readdirSync(vault, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !e.name.startsWith('.') && !e.name.startsWith('_') && e.name !== 'node_modules')
+    .map((e) => e.name).filter((d) => walk(path.join(vault, d)).length > 0).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const used = new Set();
+  const categories = dirs.map((d, i) => {
+    let id = slug(d); while (used.has(id)) id += '-2'; used.add(id);
+    return { id, name: d.replace(/^\d+[\s._-]*/, '') || d, folder: d, tag: id, color: ADOPT_PALETTE[i % ADOPT_PALETTE.length], icon: '', callout: 'folder', blurb: '' };
+  });
+  return { _readme: 'Adopted from this vault\'s own folders. Edit "color" (hex) per folder, then run: node .tengen/tools/vault.js build', theme: 'Tengen Pixel', mode: 'adopt', categories };
+}
+
 function renderClaudeMd() {
-  const tpl = read(path.join(ROOT, 'templates', 'vault-CLAUDE.md'));
-  const table = ['| Colour | Category | Folder | Tag | `cssclasses` | Hub note |', '|---|---|---|---|---|---|']
+  const file = ADOPT ? 'vault-CLAUDE-adopt.md' : 'vault-CLAUDE.md';
+  const tpl = read(path.join(ROOT, 'templates', file));
+  const table = ['| Colour | Category (folder) | Folder |', '|---|---|---|']
+    .concat(CATS.map((c) => `| \`${c.color}\` | ${c.name} | \`${c.folder}/\` |`)).join('\n');
+  const full = ['| Colour | Category | Folder | Tag | `cssclasses` | Hub note |', '|---|---|---|---|---|---|']
     .concat(CATS.map((c) => `| ${c.icon} \`${c.color}\` | ${c.name} | \`${c.folder}/\` | \`#${c.tag}\` | \`cat-${c.id}\` | ${c.id === 'hub' ? '[[Home]]' : `[[${hubTitle(c)}]]`} |`)).join('\n');
-  return tpl.replace('{{CATEGORY_TABLE}}', table).replace('{{CATEGORY_IDS}}', CATS.map((c) => c.id).join(', ')).replace(/\{\{THEME\}\}/g, THEME_NAME);
+  return tpl.replace('{{CATEGORY_TABLE}}', ADOPT ? table : full).replace('{{CATEGORY_IDS}}', CATS.map((c) => c.id).join(', ')).replace(/\{\{THEME\}\}/g, THEME_NAME);
+}
+
+/* Right-sidebar page panels, each switchable from Settings -> Appearance -> CSS snippets (generated into snippets/). */
+const PANELS = [
+  ['hide-local-graph', 'localgraph', 'the LOCAL GRAPH ("local map") of the page you are on'],
+  ['hide-backlinks', 'backlink', 'the BACKLINKS panel of the page you are on'],
+  ['hide-outgoing-links', 'outgoing-link', 'the OUTGOING LINKS panel of the page you are on'],
+  ['hide-outline', 'outline', 'the OUTLINE panel of the page you are on'],
+  ['hide-file-properties', 'file-properties', 'the PROPERTIES panel of the page you are on'],
+];
+function panelSnippets() {
+  const out = {};
+  for (const [name, type, what] of PANELS) out[name + '.css'] = `/* ${name}: ON = hides ${what}. OFF = shown again. Pure CSS, changes nothing in your vault. */\n.workspace-tab-header[data-type="${type}"],\n.workspace-leaf-content[data-type="${type}"] { display: none !important; }\n`;
+  out['hide-right-sidebar.css'] = '/* hide-right-sidebar: ON = hides the whole right sidebar (all page panels: local graph, backlinks, outgoing links, outline, properties). OFF = shown. */\n.mod-right-split, .workspace-ribbon.mod-right, .workspace-split.mod-right-sidebar { display: none !important; }\n';
+  return out;
+}
+const HOTKEYS = [
+  ['graph:open-local', ['Alt', 'Shift'], 'G'], ['backlink:open', ['Alt', 'Shift'], 'B'], ['outgoing-link:open', ['Alt', 'Shift'], 'O'],
+  ['outline:open', ['Alt', 'Shift'], 'L'], ['app:toggle-right-sidebar', ['Alt', 'Shift'], 'R'],
+];
+
+function cmdRestore() {
+  const vault = vaultDir(), root = path.join(vault, '.tengen', 'backups');
+  if (!fs.existsSync(root)) { log('No backups found (nothing was ever modified).'); return; }
+  const files = []; (function w(d) { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); e.isDirectory() ? w(p) : files.push(p); } })(root);
+  for (const f of files) {
+    const rel = path.relative(root, f).replace(/\.orig$/, '');
+    log(`${ARGS.write ? '↩' : '·'} ${rel}`);
+    if (ARGS.write) fs.copyFileSync(f, path.join(vault, rel));
+  }
+  log(ARGS.write ? `✔ restored ${files.length} files to their original (pre-Tengen) state — links added since are gone.` : `dry run — ${files.length} files would be restored to their ORIGINAL state (re-run with --write). Warning: this undoes every change made after the first backup of each file.`);
 }
 
 function cmdInstall() {
   if (INSTALLED) { console.error('Run install from the repo checkout, not from inside an installed vault.'); process.exit(2); }
   const target = ARGS._[1] || ARGS.vault;
-  if (!target) { console.error('usage: node tools/vault.js install <path-to-your-obsidian-vault> [--no-scaffold]'); process.exit(2); }
+  if (!target) { console.error('usage: node tools/vault.js install <path-to-your-obsidian-vault>'); process.exit(2); }
   const vault = path.resolve(target);
   if (!fs.existsSync(vault) || !fs.statSync(vault).isDirectory()) { console.error('Vault folder not found: ' + vault); process.exit(2); }
-  log(`Installing into ${vault}`);
-  const t = writeTheme(vault);
-  log(`✔ theme → ${path.relative(vault, t.dest)}`);
-  // snippets
-  fs.mkdirSync(path.join(vault, '.obsidian', 'snippets'), { recursive: true });
-  for (const f of fs.readdirSync(path.join(ROOT, 'snippets'))) fs.copyFileSync(path.join(ROOT, 'snippets', f), path.join(vault, '.obsidian', 'snippets', f));
-  log('✔ snippets copied (live-fireworks = the on/off switch for the animation, enabled by default; no-scene, bright-scene, readable-mode optional)');
-  // toolkit
+  ARGS.vault = vault;                                     // backups + everything below resolve against this vault
+  const structured = !!ARGS.structured;
+  log(`Installing into ${vault}  (${structured ? 'STRUCTURED: creates category folders + hubs' : 'SAFE: adopts your own folders; no notes or folders are changed'})`);
+  const ob = path.join(vault, '.obsidian');
+  fs.mkdirSync(path.join(ob, 'snippets'), { recursive: true });
+
+  // 1. toolkit (hidden .tengen/) with this vault's categories
   const kit = path.join(vault, '.tengen');
-  fs.mkdirSync(kit, { recursive: true });
-  copyDir(path.join(ROOT, 'tools'), path.join(kit, 'tools'));
-  copyDir(path.join(ROOT, 'src'), path.join(kit, 'src'));
-  copyDir(path.join(ROOT, 'templates'), path.join(kit, 'templates'));
-  copyDir(path.join(ROOT, 'snippets'), path.join(kit, 'snippets'));
-  if (fs.existsSync(path.join(ROOT, 'plugins'))) copyDir(path.join(ROOT, 'plugins'), path.join(kit, 'plugins'));
-  fs.copyFileSync(path.join(ROOT, 'categories.json'), path.join(kit, 'categories.json'));
-  if (fs.existsSync(path.join(ROOT, 'autolink-ignore.txt'))) fs.copyFileSync(path.join(ROOT, 'autolink-ignore.txt'), path.join(kit, 'autolink-ignore.txt'));
-  log('✔ toolkit → .tengen/  (hidden in Obsidian, visible to Claude)');
-  // appearance
-  const ap = path.join(vault, '.obsidian', 'appearance.json');
+  for (const d of ['tools', 'src', 'templates', 'snippets']) copyDir(path.join(ROOT, d), path.join(kit, d));
+  const catFile = path.join(kit, 'categories.json');
+  if (structured) fs.copyFileSync(path.join(ROOT, 'categories.json'), catFile);
+  else if (!fs.existsSync(catFile) || ARGS['reset-categories']) write(catFile, JSON.stringify(adoptCategories(vault), null, 2) + '\n');
+  else log('· kept your existing .tengen/categories.json (use --reset-categories to re-scan folders)');
+  if (fs.existsSync(path.join(ROOT, 'autolink-ignore.txt')) && !fs.existsSync(path.join(kit, 'autolink-ignore.txt'))) fs.copyFileSync(path.join(ROOT, 'autolink-ignore.txt'), path.join(kit, 'autolink-ignore.txt'));
+  const cats = JSON.parse(read(catFile)).categories;
+  log(`✔ toolkit → .tengen/  (hidden in Obsidian). ${cats.length} colour categories: ${cats.map((c) => c.folder).join(' · ')}`);
+
+  // 2. panel switches + other snippets (generated; pure CSS)
+  const snipDir = path.join(ob, 'snippets');
+  for (const f of fs.readdirSync(path.join(ROOT, 'snippets'))) fs.copyFileSync(path.join(ROOT, 'snippets', f), path.join(snipDir, f));
+  const panels = panelSnippets();
+  for (const [f, css] of Object.entries(panels)) { write(path.join(snipDir, f), css); write(path.join(kit, 'snippets', f), css); }
+  log('✔ snippets: live-fireworks (ON by default), hide-local-graph, hide-backlinks, hide-outgoing-links, hide-outline, hide-file-properties, hide-right-sidebar, no-scene, bright-scene, readable-mode');
+
+  // 3. build theme + graph colours + link colours inside the vault with the vault's own categories
+  require('child_process').execFileSync(process.execPath, [path.join(kit, 'tools', 'vault.js'), 'build'], { stdio: 'inherit' });
+
+  // 4. appearance.json: set theme, enable only the two colour/animation snippets
+  const ap = path.join(ob, 'appearance.json');
   let cur = {};
-  if (fs.existsSync(ap)) { try { cur = JSON.parse(read(ap)); } catch (e) { cur = {}; } backupOnce(ap); }
-  const snippets = new Set(cur.enabledCssSnippets || []); snippets.add('category-link-colors'); snippets.add('live-fireworks');
-  write(ap, JSON.stringify({ ...cur, theme: cur.theme || 'obsidian', cssTheme: THEME_NAME, enabledCssSnippets: [...snippets] }, null, 2) + '\n');
-  log(`✔ appearance.json → theme "${THEME_NAME}" enabled (pixel look, both modes)`);
-  // plugins: everything bundled in plugins/ (Dataview, copied from the user's DND vault); never overwrites an installed plugin
-  const pdir = path.join(ROOT, 'plugins');
-  const ids = fs.existsSync(pdir) ? fs.readdirSync(pdir).filter((d) => fs.statSync(path.join(pdir, d)).isDirectory()) : [];
-  for (const id of ids) {
-    const dst = path.join(vault, '.obsidian', 'plugins', id);
-    if (fs.existsSync(path.join(dst, 'main.js'))) log(`· plugin ${id} already installed — kept`); else { copyDir(path.join(pdir, id), dst); log(`✔ plugin ${id} installed`); }
+  if (fs.existsSync(ap)) { backupOnce(ap); try { cur = JSON.parse(read(ap)); } catch (e) { cur = {}; } }
+  const enabled = new Set(cur.enabledCssSnippets || []); enabled.add('category-link-colors'); enabled.add('live-fireworks');
+  write(ap, JSON.stringify({ ...cur, theme: cur.theme || 'obsidian', cssTheme: THEME_NAME, enabledCssSnippets: [...enabled] }, null, 2) + '\n');
+  log(`✔ appearance.json → theme "${THEME_NAME}" on. Your other snippets were left as they were${(cur.enabledCssSnippets || []).length ? ` (${cur.enabledCssSnippets.join(', ')}) — if one is a different visual theme, switch it off in Settings → Appearance` : ''}.`);
+
+  // 5. optional: plugin + hotkeys
+  if (ARGS['with-dataview'] && fs.existsSync(path.join(ROOT, 'plugins'))) {
+    for (const id of fs.readdirSync(path.join(ROOT, 'plugins'))) {
+      const dst = path.join(ob, 'plugins', id);
+      if (fs.existsSync(path.join(dst, 'main.js'))) { log(`· plugin ${id} already installed — kept`); continue; }
+      copyDir(path.join(ROOT, 'plugins', id), dst);
+      const cp = path.join(ob, 'community-plugins.json'); let list = []; if (fs.existsSync(cp)) { backupOnce(cp); try { list = JSON.parse(read(cp)); } catch (e) { list = []; } }
+      write(cp, JSON.stringify([...new Set([...list, id])], null, 2) + '\n'); log(`✔ plugin ${id} installed + enabled`);
+    }
+  } else log('· no plugins installed (add --with-dataview if you want Dataview)');
+  if (ARGS['with-hotkeys']) {
+    const hk = path.join(ob, 'hotkeys.json'); let cur2 = {}; if (fs.existsSync(hk)) { backupOnce(hk); try { cur2 = JSON.parse(read(hk)); } catch (e) { cur2 = {}; } }
+    const taken = new Set(Object.values(cur2).flat().map((h) => [...(h.modifiers || [])].sort().join('+') + '+' + String(h.key).toUpperCase()));
+    let added = 0;
+    for (const [cmdId, mods, key] of HOTKEYS) { const sig = [...mods].sort().join('+') + '+' + key; if (cur2[cmdId] || taken.has(sig)) continue; cur2[cmdId] = [{ modifiers: mods, key }]; added++; }
+    write(hk, JSON.stringify(cur2, null, 2) + '\n');
+    log(`✔ hotkeys: ${added} added (Alt+Shift+G local graph, B backlinks, O outgoing links, L outline, R toggle right sidebar); existing hotkeys untouched`);
   }
-  if (ids.length) {
-    const cp = path.join(vault, '.obsidian', 'community-plugins.json');
-    let enabled = []; if (fs.existsSync(cp)) { try { enabled = JSON.parse(read(cp)); } catch (e) { enabled = []; } backupOnce(cp); }
-    write(cp, JSON.stringify([...new Set([...enabled, ...ids])], null, 2) + '\n');
-    log(`✔ community-plugins.json → enabled: ${[...new Set([...enabled, ...ids])].join(', ')}  (Obsidian asks once to "Turn on community plugins")`);
+
+  // 6. CLAUDE.md so his Claude knows the rules
+  if (!ARGS['no-claude-md']) {
+    const cm = path.join(vault, 'CLAUDE.md');
+    const block = `<!-- tengen:start -->\n${renderClaudeMd().trim()}\n<!-- tengen:end -->\n`;
+    if (fs.existsSync(cm)) {
+      const old = read(cm), re = /<!-- tengen:start -->[\s\S]*?<!-- tengen:end -->\n?/;
+      backupOnce(cm);
+      write(cm, re.test(old) ? old.replace(re, () => block) : old.replace(/\s*$/, '\n\n') + block);
+      log('✔ CLAUDE.md → Tengen section appended to your existing file (the rest is untouched)');
+    } else { write(cm, block); log('✔ CLAUDE.md → created (instructions for Claude only)'); }
   }
-  const cpl = path.join(vault, '.obsidian', 'core-plugins.json');
-  if (!fs.existsSync(cpl)) write(cpl, JSON.stringify({ 'file-explorer': true, 'global-search': true, switcher: true, graph: true, backlink: true, canvas: true, 'outgoing-link': true, 'tag-pane': true, properties: true, 'page-preview': true, 'command-palette': true, bookmarks: true, outline: true, 'word-count': true, 'file-recovery': true, bases: true }, null, 2) + '\n');
-  // graph
-  mergeJson(path.join(vault, '.obsidian', 'graph.json'), { colorGroups: colorGroups() }, GRAPH_DEFAULTS);
-  log('✔ graph.json → one colour group per category (existing graph settings kept)');
-  // CLAUDE.md
-  const cm = path.join(vault, 'CLAUDE.md');
-  const block = `<!-- tengen:start -->\n${renderClaudeMd().trim()}\n<!-- tengen:end -->\n`;
-  if (fs.existsSync(cm)) {
-    const old = read(cm);
-    const re = /<!-- tengen:start -->[\s\S]*?<!-- tengen:end -->\n?/;
-    backupOnce(cm);
-    write(cm, re.test(old) ? old.replace(re, () => block) : old.replace(/\s*$/, '\n\n') + block);
-    log('✔ CLAUDE.md → Tengen section merged into your existing file');
-  } else { write(cm, block); log('✔ CLAUDE.md → created'); }
-  // scaffold
-  if (!ARGS['no-scaffold']) {
-    ARGS.vault = vault;
+
+  // 7. structured vaults only: folders + hubs
+  if (structured) {
     const created = ensureHubNotes();
-    log(created.length ? `✔ created ${created.length} folders/hubs (your own notes were not touched)` : '✔ folders/hubs already present');
-    cmdHubs();
-    cmdColors();
+    log(created.length ? `✔ created ${created.length} folders/hubs` : '✔ folders/hubs already present');
+    cmdHubs(); cmdColors();
   }
   log(`
-Next:
-  1. In Obsidian: Settings → Appearance → Themes → pick "${THEME_NAME}" (already set; reload with Ctrl/Cmd+R if open).
-  2. In a terminal:  cd "${vault}"  &&  claude
-  3. Ask Claude to run:  node .tengen/tools/vault.js normalize   (dry run first)  then  autolink / check.`);
+Done. No existing note was modified.
+  1. Obsidian: reload (Ctrl/Cmd+R) → Settings → Appearance → theme "${THEME_NAME}" is selected.
+  2. Toggle live fireworks / right-side panels in Settings → Appearance → CSS snippets.
+  3. Optional internal linking, from a terminal:  cd "${vault}"  &&  claude   ("follow CLAUDE.md: dry-run autolink and show me the summary")
+     Or directly:  node .tengen/tools/vault.js autolink   (preview)   then   --write   (apply).   Undo anything:  node .tengen/tools/vault.js restore --write`);
 }
 
 /* ------------------------------------------------------------------ main */
 const cmd = ARGS._[0];
-const table = { build: cmdBuild, install: cmdInstall, scaffold: cmdScaffold, hubs: cmdHubs, new: cmdNew, normalize: cmdNormalize, autolink: () => cmdAutolink(false), check: cmdCheck, colors: cmdColors };
+const table = { restore: cmdRestore, build: cmdBuild, install: cmdInstall, scaffold: cmdScaffold, hubs: cmdHubs, new: cmdNew, normalize: cmdNormalize, autolink: () => cmdAutolink(false), check: cmdCheck, colors: cmdColors };
+if (ADOPT && ['scaffold', 'hubs', 'new', 'normalize'].includes(cmd)) { console.error(`'${cmd}' creates or edits notes/folders, so it is disabled in this vault (safe mode: colours and internal links only). Use: autolink, check, colors, build, restore.`); process.exit(2); }
 if (!table[cmd]) { console.log(read(__filename).split('\n').slice(1, 22).join('\n')); process.exit(cmd ? 2 : 0); }
 table[cmd]();

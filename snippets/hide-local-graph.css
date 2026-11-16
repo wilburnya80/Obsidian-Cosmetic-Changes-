@@ -1,0 +1,3 @@
+/* hide-local-graph: ON = hides the LOCAL GRAPH ("local map") of the page you are on. OFF = shown again. Pure CSS, changes nothing in your vault. */
+.workspace-tab-header[data-type="localgraph"],
+.workspace-leaf-content[data-type="localgraph"] { display: none !important; }
