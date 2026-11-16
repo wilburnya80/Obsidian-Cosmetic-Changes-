@@ -1,2 +1,0 @@
-/* Hide the Tengen silhouette (keeps sky + fireworks). */
-body.theme-dark::before, body.theme-light::before { background-image: none, repeating-conic-gradient(from 0deg at 50% 42%, rgba(255,45,85,.16) 0deg 2.2deg, transparent 2.2deg 8deg), radial-gradient(ellipse 70% 45% at 50% 110%, rgba(255,45,85,.55), transparent 70%), linear-gradient(180deg,#05020f 0%,#12062e 55%,#2a0a3f 100%); }
