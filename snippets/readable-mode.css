@@ -1,2 +1,2 @@
-/* Readable mode: nearly opaque panes for long writing sessions; fireworks still play at the edges. */
-body { --tg-pane-alpha: 0.94; --tg-side-alpha: 0.96; --tg-blur: 0px; }
+/* Readable mode: nearly opaque panes for long writing sessions. */
+body.theme-dark, body.theme-light { --tg-pane: rgba(20, 11, 44, 0.95); --tg-side: rgba(15, 8, 34, 0.96); }

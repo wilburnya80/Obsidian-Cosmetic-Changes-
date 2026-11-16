@@ -1,6 +1,6 @@
 {
   "_readme": "SINGLE SOURCE OF TRUTH for categories. Edit here, then run: node tools/vault.js build. Every category gets a folder, a tag, a CSS class (cat-<id>), a callout, a graph colour and a hub note. Colours are the colour-sorting system for the whole vault.",
-  "theme": "Tengen Entertainment District",
+  "theme": "Tengen Pixel",
   "categories": [
     { "id": "hub",        "name": "Hubs",           "folder": "00 Hub",            "tag": "hub",        "color": "#ffe9a8", "icon": "🏯", "callout": "castle",      "blurb": "Entry points and indexes. Home links to every category hub; every hub links to every note in its category." },
     { "id": "characters", "name": "Characters",     "folder": "01 Characters",     "tag": "characters", "color": "#ff2d55", "icon": "🗡️", "callout": "sword",       "blurb": "People: slayers, Hashira, allies, family." },

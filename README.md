@@ -1,14 +1,12 @@
-# Tengen · Entertainment District — Obsidian theme + Claude-ready vault kit
+# Tengen Pixel — pixel-art Obsidian theme + Claude-ready vault kit
 
-**Tengen Uzui on a Yoshiwara rooftop, both chained cleavers drawn, fireworks bursting live behind your notes.**
-Dark mode is *Night Parade* (crimson / violet / magenta). Light mode is *Manga Panel* (ink, paper, screentone, speed-lines).
-Every note belongs to a **colour-coded category**, and a built-in toolkit lets **Claude Code in the terminal** keep the whole vault ultra-densely cross-linked.
+**Pixel-art Tengen Uzui on a Yoshiwara rooftop, both chained cleavers raised, animated pixel fireworks bursting over a lantern-lit night city.**
+Built with the same technique as the pixel theme in `dnd-game-brain` (pixel SVG scene behind translucent panes, Pixelify Sans headings, hard 3px borders, block shadows).
+Every note belongs to a **colour-coded category**, and a built-in toolkit lets **Claude Code in the terminal** keep the vault ultra-densely cross-linked.
 
-| Night Parade (dark) | Manga Panel (light) |
-|---|---|
-| ![dark](docs/preview-night-fireworks-a.png) | ![light](docs/preview-light-manga.png) |
+![pixel scene](docs/preview-pixel-tengen.png)
 
-> Previews are rendered from the real `theme.css` in a mock Obsidian-style window. The fireworks and Tengen are CSS-only animation, so they play live in Obsidian; the screenshots are single frames (`docs/preview-night-fireworks-b.png` is another moment).
+> Preview rendered from the real `theme.css` in a mock Obsidian-style window (single frame; the scene animates: bursts, twinkling stars, flickering lanterns, drifting embers, idle bob).
 
 ## What's in the box
 
@@ -16,9 +14,10 @@ Every note belongs to a **colour-coded category**, and a built-in toolkit lets *
 |---|---|
 | `theme.css`, `manifest.json` | The installable Obsidian theme (generated — don't hand-edit) |
 | `categories.json` | **Single source of truth** for the colour-sorted categories (folder, tag, colour, icon, callout) |
-| `src/*.css`, `src/tengen.svg` | Theme sources: variables, panes, typography, categories (generated), the Tengen + fireworks scene, light mode |
+| `src/*.css`, `src/pixel-scene.js` | Theme sources. `pixel-scene.js` draws the pixel scene (sprite Tengen, roof, skyline, fireworks) as animated SVG |
+| `plugins/dataview/` | Dataview, copied from your DND vault; the installer enables it |
 | `tools/vault.js` | Zero-dependency Node tool: build theme, install, scaffold, hubs, new note, normalize, **autolink**, **check** |
-| `snippets/` | Optional toggles: `calm-mode`, `bright-scene`, `readable-mode`, `no-tengen` |
+| `snippets/` | Optional toggles: `no-scene`, `bright-scene`, `readable-mode` |
 | `templates/vault-CLAUDE.md` | The instructions installed into a vault so its Claude knows the rules |
 | `starter-vault/` | A ready-to-open sample vault: 62 Demon Slayer notes, 10 hubs, ~960 internal links, zero broken links |
 
@@ -33,7 +32,7 @@ git checkout claude/kind-ritchie-gw1wti       # until it is merged
 node tools/vault.js install "/path/to/his/vault"
 ```
 
-That installs the theme and sets it active, enables per-category link colours, colours the graph view, drops the toolkit in a hidden `.tengen/` folder, writes (or merges into) the vault's `CLAUDE.md`, and creates the category folders plus hub notes. **It does not move, edit or delete any existing note.** Original `appearance.json`/`graph.json`/`CLAUDE.md` are backed up once as `*.tengen-bak`.
+That installs the theme and sets it active, installs and enables the Dataview plugin (Obsidian asks once to turn on community plugins), enables per-category link colours, colours the graph view, drops the toolkit in a hidden `.tengen/` folder, writes (or merges into) the vault's `CLAUDE.md`, and creates the category folders plus hub notes. **It does not move, edit or delete any existing note.** Original `appearance.json`/`graph.json`/`CLAUDE.md` are backed up once as `*.tengen-bak`.
 
 Then:
 
@@ -45,7 +44,7 @@ claude
 and tell Claude something like *"Follow CLAUDE.md. Dry-run `normalize` and `autolink`, show me the summary, then organise my notes into the categories."*
 
 ### Manual install (theme only)
-Copy `theme.css` + `manifest.json` into `<vault>/.obsidian/themes/Tengen Entertainment District/`, then Settings → Appearance → Themes → pick it. (Optional: copy `snippets/*.css` into `<vault>/.obsidian/snippets/`.)
+Copy `theme.css` + `manifest.json` into `<vault>/.obsidian/themes/Tengen Pixel/`, then Settings → Appearance → Themes → pick it. (Optional: copy `snippets/*.css` into `<vault>/.obsidian/snippets/`.)
 
 ### Just try it
 Open `starter-vault/` as a vault in Obsidian (*Open folder as vault*), trust the vault, and the theme is already active. Open the **Graph view** to see the colour-sorted clusters.
@@ -91,15 +90,13 @@ Anything that edits existing notes is a **dry run unless you pass `--write`**.
 
 ## Tweaking the look
 
-* Knobs at the top of `src/10-variables.css`: `--tg-pane-alpha` (how much fireworks show through the editor), `--tg-side-alpha`, `--tg-blur`.
-* Fireworks: `genFireworks()` in `tools/vault.js` (three layers; counts, durations, palettes, burst sizes). Tengen: `src/tengen.svg`.
-* Snippets (Settings → Appearance → CSS snippets): `calm-mode` stops all animation, `bright-scene` makes panes very see-through, `readable-mode` makes them nearly opaque, `no-tengen` hides the silhouette.
-* After editing `src/` run `node tools/vault.js build`, then `node tools/vault.js install starter-vault` to sync the sample vault's copy.
+* Scene: `src/pixel-scene.js` (sprite grid for Tengen, firework list near the top: position, palette, timing, size). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
+* Snippets (Settings → Appearance → CSS snippets): `no-scene` hides the animation, `bright-scene` makes panes see-through, `readable-mode` makes them nearly opaque.
+* After editing run `node tools/vault.js build`, then `node tools/vault.js install starter-vault` to sync the sample vault.
 
 ## Honest limitations
 
-* Obsidian themes are **CSS only**: the fireworks are CSS keyframe animation (three layers of bursts on a loop), not true particle physics. Tengen is a stylised vector silhouette, not the anime frame.
+* Headings use the Pixelify Sans web font (loaded from Google Fonts, as in your DND theme); offline it falls back to a system font.
 * In **Live Preview / editing** mode every link uses one colour; **per-category link colours** apply in Reading view, hover previews and the Properties panel. Folder, tag, graph, title and callout colours work everywhere.
-* The theme was built and screenshot-tested in Chromium against a mock of Obsidian's DOM, **not inside Obsidian itself**. If a pane colour or class is off in your version, tell Claude which element and it can patch `src/20-chrome.css` — selectors are the standard Obsidian ones.
-* Sample lore in `starter-vault/` is illustrative; replace it with your own notes (the category system is generic).
-* Animations respect `prefers-reduced-motion`.
+* Not tested inside Obsidian itself (none in the cloud container): screenshot-tested in Chromium against a mock of Obsidian's DOM, reusing the container/pane rules from your working DND snippet.
+* Sample lore in `starter-vault/` is illustrative; replace with your own notes.

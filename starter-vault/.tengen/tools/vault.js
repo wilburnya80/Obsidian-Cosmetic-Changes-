@@ -81,103 +81,47 @@ function genCategoryCss() {
 /* ---- ${c.icon} ${c.name} · ${c.color} ---- */
 .nav-folder-title[data-path="${f}"],
 .nav-folder-title[data-path^="${f}/"] { color: ${v}; }
-.nav-folder-title[data-path="${f}"] { border-left: 3px solid ${v}; background: linear-gradient(90deg, rgba(${rgb}, 0.18), transparent 85%); text-shadow: 0 0 10px rgba(${rgb}, 0.45); }
-.nav-file-title[data-path^="${f}/"] { border-left: 2px solid rgba(${rgb}, 0.55); }
+.nav-folder-title[data-path="${f}"] { border-left: 5px solid ${v}; background: rgba(${rgb}, 0.14); text-shadow: 2px 2px 0 #1a1426; }
+.nav-file-title[data-path^="${f}/"] { border-left: 3px solid rgba(${rgb}, 0.7); }
 .nav-file-title[data-path^="${f}/"]:hover,
-.nav-file-title[data-path^="${f}/"].is-active { color: ${v}; background: rgba(${rgb}, 0.16); }
+.nav-file-title[data-path^="${f}/"].is-active { color: ${v}; background: rgba(${rgb}, 0.18); box-shadow: inset 4px 0 0 ${v}; }
 .cat-${c.id} .inline-title,
-.cat-${c.id} .markdown-rendered h1 { color: ${v}; text-shadow: 0 0 22px rgba(${rgb}, 0.5), 3px 3px 0 rgba(0, 0, 0, 0.55); }
+.cat-${c.id} .markdown-rendered h1 { color: ${v}; text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.7); }
 .cat-${c.id} .markdown-rendered h1 { border-bottom-color: ${v}; }
 .cat-${c.id} .markdown-rendered h2::before { color: ${v}; }
-.cat-${c.id} .markdown-rendered { --blockquote-border-color: ${v}; --blockquote-background-color: rgba(${rgb}, 0.08); }
-.cat-${c.id} .markdown-source-view.mod-cm6 { --blockquote-border-color: ${v}; }
-.cat-${c.id} .metadata-container { border-left: 4px solid ${v}; box-shadow: -6px 0 18px -10px rgba(${rgb}, 0.8); }
-.cat-${c.id} .markdown-rendered hr { background: linear-gradient(90deg, transparent, ${v}, transparent); }
+.cat-${c.id} .markdown-rendered { --blockquote-border-color: ${v}; }
+.cat-${c.id} .metadata-container { border-color: ${v}; box-shadow: 4px 4px 0 rgba(${rgb}, 0.45); }
+.cat-${c.id} .markdown-rendered hr { background: repeating-linear-gradient(90deg, ${v} 0 8px, transparent 8px 12px); }
 a.tag[href="#${cssStr(c.tag)}"], a.tag[href^="#${cssStr(c.tag)}/"],
-.cm-tag-${c.tag}, .cm-hashtag.cm-tag-${c.tag} { color: ${v}; background: rgba(${rgb}, 0.14); border-color: rgba(${rgb}, 0.7); }
+.cm-tag-${c.tag}, .cm-hashtag.cm-tag-${c.tag} { color: ${v}; background: rgba(${rgb}, 0.16); border-color: ${v}; }
 .callout[data-callout="${c.id}"] { --callout-color: ${rgb}; --callout-icon: lucide-${c.callout}; }
-.callout[data-callout="${c.id}"] .callout-title { color: ${v}; }
-body.theme-light .nav-file-title[data-path^="${f}/"].is-active { box-shadow: 3px 3px 0 ${v}; }`);
+.callout[data-callout="${c.id}"] .callout-title { color: ${v}; }`);
   }
-  out.push('\n/* ---- light mode ("Manga Panel"): same hues, inked down for contrast ---- */');
-  out.push('.theme-light {');
-  for (const c of CATS) out.push(`  --cat-${c.id}: color-mix(in srgb, ${c.color} 52%, #000);`);
-  out.push('}');
-  out.push('body.theme-light .nav-folder-title, body.theme-light .inline-title, body.theme-light .markdown-rendered h1 { text-shadow: none; }');
-  out.push('body.theme-light .inline-title { text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18); }');
-  out.push('body.theme-light .metadata-container { box-shadow: none; }');
   return out.join('\n');
 }
 
-function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
-const n1 = (x) => Math.round(x * 10) / 10;
-const n2 = (x) => (Math.round(x * 100) / 100).toString();
-
-function burstShadow(palette, R, glowColor) {
-  const sh = [`0 0 34px 14px ${glowColor}`];
-  const ring = (count, radius, phase, size) => {
-    for (let i = 0; i < count; i++) {
-      const a = phase + (i / count) * Math.PI * 2;
-      const col = palette[i % palette.length];
-      sh.push(`${n1(Math.cos(a) * radius)}px ${n1(Math.sin(a) * radius)}px 0 ${size}px ${col}`);
-    }
-  };
-  ring(40, R, 0, 1);
-  ring(40, R * 0.93, Math.PI / 40, 0);    // trailing sparks just inside the main ring
-  ring(40, R * 0.86, 0, -1);
-  ring(24, R * 0.6, Math.PI / 24, 0);
-  ring(14, R * 0.3, 0, 0);
-  return sh.join(',\n    ');
+function sceneDataUri() {
+  const { buildSceneSvg } = require(path.join(ROOT, 'src', 'pixel-scene.js'));
+  return `"data:image/svg+xml;base64,${Buffer.from(buildSceneSvg(), 'utf8').toString('base64')}"`;
 }
 
-function genFireworks() {
-  const seqs = [
-    { sel: 'body::after',               kf: 'tg-fw-a', n: 7, dur: 15, delay: -4, seed: 7,  R: 120, pal: ['#ff2d55', '#ff4fd8', '#ffc93c', '#ffffff'], glow: 'rgba(255, 90, 120, 0.55)' },
-    { sel: '.app-container::before',    kf: 'tg-fw-b', n: 6, dur: 19, delay: -9, seed: 21, R: 110, pal: ['#8b3dff', '#3ea6ff', '#ff4fd8', '#ffffff'], glow: 'rgba(150, 100, 255, 0.5)' },
-    { sel: '.app-container::after',     kf: 'tg-fw-c', n: 5, dur: 12, delay: -2, seed: 99, R: 130, pal: ['#ffc93c', '#ff8a3d', '#ff2d55', '#ffe9a8'], glow: 'rgba(255, 190, 80, 0.55)' },
-  ];
-  const css = [];
-  for (const s of seqs) {
-    const rand = rng(s.seed);
-    css.push(`${s.sel} {\n  box-shadow:\n    ${burstShadow(s.pal, s.R, s.glow)};\n  animation: ${s.kf} ${s.dur}s linear ${s.delay}s infinite;\n}`);
-    const W = 100 / s.n;
-    const kf = [`@keyframes ${s.kf} {`, '  0% { opacity: 0; }'];
-    for (let i = 0; i < s.n; i++) {
-      const st = 1 + i * W + rand() * W * 0.2;
-      const life = W * (0.62 + rand() * 0.1);
-      const x = n1(9 + rand() * 82), y = n1(7 + rand() * 46);
-      const m = n2(1.1 + rand() * 0.9);
-      const pos = `translate(${x}vw, ${y}vh)`;
-      kf.push(`  ${n2(st - 0.02)}% { transform: ${pos} scale(0.03); opacity: 0; }`);
-      kf.push(`  ${n2(st)}% { transform: ${pos} scale(0.03); opacity: 1; animation-timing-function: cubic-bezier(0.08, 0.7, 0.25, 1); }`);
-      kf.push(`  ${n2(st + life * 0.42)}% { transform: ${pos} scale(${m}); opacity: 1; animation-timing-function: ease-in; }`);
-      kf.push(`  ${n2(st + life)}% { transform: translate(${x}vw, ${n1(y + 9)}vh) scale(${n2(m * 1.12)}); opacity: 0; }`);
-    }
-    kf.push('  100% { opacity: 0; }', '}');
-    css.push(kf.join('\n'));
-  }
-  return css.join('\n\n');
-}
-
-function svgDataUri() {
-  const raw = read(path.join(ROOT, 'src', 'tengen.svg')).replace(/<!--[\s\S]*?-->/g, '').replace(/\s*\n\s*/g, ' ').trim();
-  return `"data:image/svg+xml;utf8,${encodeURIComponent(raw).replace(/'/g, '%27').replace(/"/g, '%22')}"`;
+// Same rule shape as the proven dnd-pixel snippet: fixed, behind everything, pixel-crisp.
+function sceneRule() {
+  return `body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; image-rendering: pixelated; background: #0d0720 url(${sceneDataUri()}) right bottom / cover no-repeat; }`;
 }
 
 function buildThemeCss() {
   const dir = path.join(ROOT, 'src');
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.css')).sort();
-  const svg = svgDataUri();
-  const fw = genFireworks();
+  const scene = sceneRule();
   const cats = genCategoryCss();
   return files.map((f) => read(path.join(dir, f))
-    .replace(/\{\{TENGEN_SVG\}\}/g, () => svg)
-    .replace('{{FIREWORKS}}', () => fw)
+    .replace('{{SCENE_RULE}}', () => scene)
     .replace('{{CATEGORY_CSS}}', () => cats)).join('\n\n') + '\n';
 }
 
 function manifest() {
-  return JSON.stringify({ name: THEME_NAME, version: '1.0.0', minAppVersion: '1.0.0', author: 'Tengen Theme', authorUrl: 'https://github.com/wilburnya80/Obsidian-Cosmetic-Changes-' }, null, 2) + '\n';
+  return JSON.stringify({ name: THEME_NAME, version: '1.0.0', minAppVersion: '1.0.0', author: 'Tengen Pixel', authorUrl: 'https://github.com/wilburnya80/Obsidian-Cosmetic-Changes-' }, null, 2) + '\n';
 }
 
 function writeTheme(vault) {
@@ -727,7 +671,7 @@ function cmdInstall() {
   // snippets
   fs.mkdirSync(path.join(vault, '.obsidian', 'snippets'), { recursive: true });
   for (const f of fs.readdirSync(path.join(ROOT, 'snippets'))) fs.copyFileSync(path.join(ROOT, 'snippets', f), path.join(vault, '.obsidian', 'snippets', f));
-  log('✔ snippets copied (calm-mode, bright-scene, readable-mode, no-tengen — enable any in Settings → Appearance)');
+  log('✔ snippets copied (no-scene, bright-scene, readable-mode — enable any in Settings → Appearance)');
   // toolkit
   const kit = path.join(vault, '.tengen');
   fs.mkdirSync(kit, { recursive: true });
@@ -735,6 +679,7 @@ function cmdInstall() {
   copyDir(path.join(ROOT, 'src'), path.join(kit, 'src'));
   copyDir(path.join(ROOT, 'templates'), path.join(kit, 'templates'));
   copyDir(path.join(ROOT, 'snippets'), path.join(kit, 'snippets'));
+  if (fs.existsSync(path.join(ROOT, 'plugins'))) copyDir(path.join(ROOT, 'plugins'), path.join(kit, 'plugins'));
   fs.copyFileSync(path.join(ROOT, 'categories.json'), path.join(kit, 'categories.json'));
   if (fs.existsSync(path.join(ROOT, 'autolink-ignore.txt'))) fs.copyFileSync(path.join(ROOT, 'autolink-ignore.txt'), path.join(kit, 'autolink-ignore.txt'));
   log('✔ toolkit → .tengen/  (hidden in Obsidian, visible to Claude)');
@@ -744,7 +689,22 @@ function cmdInstall() {
   if (fs.existsSync(ap)) { try { cur = JSON.parse(read(ap)); } catch (e) { cur = {}; } backupOnce(ap); }
   const snippets = new Set(cur.enabledCssSnippets || []); snippets.add('category-link-colors');
   write(ap, JSON.stringify({ ...cur, theme: cur.theme || 'obsidian', cssTheme: THEME_NAME, enabledCssSnippets: [...snippets] }, null, 2) + '\n');
-  log(`✔ appearance.json → theme "${THEME_NAME}" enabled (dark = Night Parade, light = Manga Panel)`);
+  log(`✔ appearance.json → theme "${THEME_NAME}" enabled (pixel look, both modes)`);
+  // plugins: everything bundled in plugins/ (Dataview, copied from the user's DND vault); never overwrites an installed plugin
+  const pdir = path.join(ROOT, 'plugins');
+  const ids = fs.existsSync(pdir) ? fs.readdirSync(pdir).filter((d) => fs.statSync(path.join(pdir, d)).isDirectory()) : [];
+  for (const id of ids) {
+    const dst = path.join(vault, '.obsidian', 'plugins', id);
+    if (fs.existsSync(path.join(dst, 'main.js'))) log(`· plugin ${id} already installed — kept`); else { copyDir(path.join(pdir, id), dst); log(`✔ plugin ${id} installed`); }
+  }
+  if (ids.length) {
+    const cp = path.join(vault, '.obsidian', 'community-plugins.json');
+    let enabled = []; if (fs.existsSync(cp)) { try { enabled = JSON.parse(read(cp)); } catch (e) { enabled = []; } backupOnce(cp); }
+    write(cp, JSON.stringify([...new Set([...enabled, ...ids])], null, 2) + '\n');
+    log(`✔ community-plugins.json → enabled: ${[...new Set([...enabled, ...ids])].join(', ')}  (Obsidian asks once to "Turn on community plugins")`);
+  }
+  const cpl = path.join(vault, '.obsidian', 'core-plugins.json');
+  if (!fs.existsSync(cpl)) write(cpl, JSON.stringify({ 'file-explorer': true, 'global-search': true, switcher: true, graph: true, backlink: true, canvas: true, 'outgoing-link': true, 'tag-pane': true, properties: true, 'page-preview': true, 'command-palette': true, bookmarks: true, outline: true, 'word-count': true, 'file-recovery': true, bases: true }, null, 2) + '\n');
   // graph
   mergeJson(path.join(vault, '.obsidian', 'graph.json'), { colorGroups: colorGroups() }, GRAPH_DEFAULTS);
   log('✔ graph.json → one colour group per category (existing graph settings kept)');

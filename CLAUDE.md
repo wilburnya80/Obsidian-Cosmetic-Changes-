@@ -4,7 +4,8 @@ This repo is an **Obsidian theme + Claude-ready vault kit** (Demon Slayer / Teng
 
 ## Layout
 * `categories.json` — source of truth for categories/colours. Edit here, never hard-code category colours in CSS.
-* `src/*.css` + `src/tengen.svg` — theme sources. `35-categories.css` and the `{{FIREWORKS}}`/`{{TENGEN_SVG}}` tokens are filled by the build.
+* `src/*.css` + `src/pixel-scene.js` — theme sources. `35-categories.css` and the `{{SCENE_RULE}}` token are filled by the build. The scene is generated pixel-art SVG (see dnd-game-brain/_builder/pixelart.ps1 for the original technique).
+* `plugins/dataview/` — bundled Obsidian plugin (from dnd-game-brain), installed by `install`.
 * `tools/vault.js` — the whole toolkit (Node, no dependencies). Mode is auto-detected: repo checkout vs. installed `.tengen/`.
 * `theme.css`, `manifest.json` — GENERATED. Never hand-edit.
 * `starter-vault/` — sample vault with the toolkit installed into `starter-vault/.tengen/`. Treat its `.obsidian/themes/…`, `.tengen/`, `CLAUDE.md` and `00 Hub/` auto-lists as generated.
@@ -19,8 +20,8 @@ cd starter-vault && node .tengen/tools/vault.js hubs && node .tengen/tools/vault
 ```
 
 ## Rules
-* Both dark (`.theme-dark`) and light (`.theme-light`) must keep working; modals/menus/popovers stay opaque; body text contrast ≥ 4.5:1.
+* Look = PIXEL ART (user rejected the earlier neon/glow design). Hard borders, no rounding, block shadows, Pixelify Sans. Applies to both `.theme-dark` and `.theme-light`. Modals/menus stay opaque.
 * Obsidian themes are CSS-only — no JavaScript in the theme.
-* Fireworks are 3 CSS pseudo-element layers (`body::after`, `.app-container::before/::after`); Tengen lives in `body::before`. Keep `pointer-events: none` and the `prefers-reduced-motion` fallback.
+* The scene lives in `body::before` (fixed, z-index -1, base64 SVG with SMIL animation). Keep `pointer-events: none` and the transparent-container rules in `20-chrome.css`.
 * `vault.js` commands that edit existing notes must stay **dry-run by default** and back up once (`*.tengen-bak`); the installer must never move/delete user notes.
 * Visual check: render `theme.css` in headless Chromium (Playwright is installed) against a mock DOM using Obsidian class names; there is no Obsidian binary in the cloud container.
