@@ -4,9 +4,6 @@
 Built with the same technique as the pixel theme in `dnd-game-brain` (pixel SVG scene behind translucent panes, Pixelify Sans headings, hard 3px borders, block shadows).
 Every note belongs to a **colour-coded category**, and a built-in toolkit lets **Claude Code in the terminal** keep the vault ultra-densely cross-linked.
 
-![pixel scene](docs/preview-pixel-tengen.png)
-
-> Preview rendered from the real `theme.css` in a mock Obsidian-style window (single frame; the scene animates: radial-streak fireworks, twinkling blue sparkles, drifting pink smoke, rising sparks, idle bob).
 
 ## What's in the box
 

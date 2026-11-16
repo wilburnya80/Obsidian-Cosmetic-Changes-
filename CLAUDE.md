@@ -10,7 +10,6 @@ This repo is an **Obsidian theme + Claude-ready vault kit** (Demon Slayer / Teng
 * `theme.css`, `manifest.json` — GENERATED. Never hand-edit.
 * `starter-vault/` — sample vault with the toolkit installed into `starter-vault/.tengen/`. Treat its `.obsidian/themes/…`, `.tengen/`, `CLAUDE.md` and `00 Hub/` auto-lists as generated.
 * `snippets/` — optional CSS toggles, copied into vaults on install.
-* `docs/` — preview screenshots referenced by README.
 
 ## After ANY change to `src/`, `categories.json`, `tools/` or `templates/`
 ```bash
