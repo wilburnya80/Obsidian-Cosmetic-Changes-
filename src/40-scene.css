@@ -1,0 +1,51 @@
+/* ==========================================================================
+   SCENE  —  Tengen on the Yoshiwara rooftop, both cleavers drawn, fireworks live.
+   body::before            sky + red speed-lines + Tengen/roof silhouette
+   body::after             fireworks layer A
+   .app-container::before  fireworks layer B   (behind the panes, in front of the sky)
+   .app-container::after   fireworks layer C
+   All pointer-events:none. Disable with snippets/calm-mode.css.
+   ========================================================================== */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    url({{TENGEN_SVG}}) no-repeat calc(50% + 16vw) 100% / auto min(80vh, 780px),
+    repeating-conic-gradient(from 0deg at calc(50% + 16vw) 42%, rgba(255, 45, 85, 0.16) 0deg 2.2deg, transparent 2.2deg 8deg),
+    radial-gradient(ellipse 70% 45% at 50% 110%, rgba(255, 45, 85, 0.55), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 15% 5%, rgba(139, 61, 255, 0.5), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 90% 15%, rgba(255, 79, 216, 0.32), transparent 70%),
+    linear-gradient(180deg, #05020f 0%, #12062e 55%, #2a0a3f 100%);
+  animation: tg-sky-pulse 6s ease-in-out infinite alternate;
+}
+@keyframes tg-sky-pulse { from { filter: brightness(0.92); } to { filter: brightness(1.12) saturate(1.1); } }
+
+/* shared base for the three firework layers */
+body::after,
+.app-container::before,
+.app-container::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  filter: brightness(1.25);
+}
+body::after { z-index: 0; }
+.app-container::before, .app-container::after { z-index: -1; }
+
+{{FIREWORKS}}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+  body::after, .app-container::before, .app-container::after { animation: none; opacity: 0; }
+}

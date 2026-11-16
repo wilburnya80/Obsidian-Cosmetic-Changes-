@@ -1,0 +1,3 @@
+/* Calm mode: stops all animation (fireworks + sky pulse) but keeps the scene. Enable in Settings > Appearance > CSS snippets. */
+body::before, body::after, .app-container::before, .app-container::after { animation: none !important; }
+body::after, .app-container::before, .app-container::after { opacity: 0 !important; }

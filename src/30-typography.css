@@ -1,0 +1,81 @@
+/* ==========================================================================
+   TYPOGRAPHY  —  headings, links, quotes, tables, code, lists, callouts
+   ========================================================================== */
+
+.markdown-rendered, .markdown-source-view.mod-cm6 { line-height: 1.7; }
+.markdown-preview-view, .cm-s-obsidian { --file-line-width: 780px; }
+
+.inline-title {
+  font-family: var(--tg-display);
+  letter-spacing: 0.06em;
+  font-size: 2.6em;
+  color: var(--tg-gold);
+  text-shadow: 0 0 22px rgba(255, 201, 60, 0.4), 3px 3px 0 rgba(255, 45, 85, 0.8);
+}
+.theme-light .inline-title { color: #000; text-shadow: 3px 3px 0 #d6002a; }
+
+/* headings: ink-brush underlines */
+.markdown-rendered h1, .HyperMD-header-1, .cm-header-1 { font-family: var(--tg-display); letter-spacing: 0.05em; }
+.markdown-rendered h1 { border-bottom: 3px solid var(--tg-crimson); padding-bottom: 4px; }
+.markdown-rendered h2 { border-bottom: 1px dashed var(--background-modifier-border-hover); padding-bottom: 2px; }
+.markdown-rendered h2::before { content: "◆ "; color: var(--tg-crimson); font-size: 0.7em; vertical-align: middle; }
+.theme-light .markdown-rendered h1 { border-bottom: 4px solid #000; }
+
+/* links: neon on dark, ink-underline on light. Category colours are layered on top (see category css). */
+a, .cm-hmd-internal-link, .internal-link { text-decoration: none; }
+.markdown-rendered a.internal-link,
+.cm-hmd-internal-link .cm-underline { border-bottom: 1px solid currentColor; text-decoration: none; transition: color .15s, text-shadow .15s; }
+.markdown-rendered a.internal-link:hover,
+.cm-hmd-internal-link:hover { text-shadow: 0 0 10px currentColor; }
+.internal-link.is-unresolved { opacity: 0.7; border-bottom-style: dashed !important; }
+.external-link { color: var(--link-external-color); }
+
+/* quote = a manga panel */
+blockquote, .markdown-rendered blockquote {
+  border-left: 4px solid var(--blockquote-border-color);
+  background: var(--blockquote-background-color);
+  border-radius: 0 var(--tg-radius) var(--tg-radius) 0;
+  padding: 0.4em 1em;
+}
+
+/* tables */
+.markdown-rendered table { border: 1px solid var(--background-modifier-border-hover); border-radius: var(--tg-radius); overflow: hidden; }
+.markdown-rendered th { background: rgba(255, 45, 85, 0.18); color: var(--tg-gold); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8em; }
+.theme-light .markdown-rendered th { background: #000; color: #fff; }
+.markdown-rendered tr:nth-child(even) td { background: rgba(255, 255, 255, 0.025); }
+.theme-light .markdown-rendered tr:nth-child(even) td { background: rgba(0, 0, 0, 0.04); }
+
+/* code */
+.markdown-rendered pre, .cm-s-obsidian .HyperMD-codeblock { border: 1px solid var(--background-modifier-border); border-radius: 8px; }
+.markdown-rendered code { border-radius: 4px; padding: 0.1em 0.35em; }
+
+/* lists, tasks, hr */
+.markdown-rendered ul > li::marker { color: var(--tg-crimson); }
+.markdown-rendered ol > li::marker { color: var(--tg-gold); font-weight: 700; }
+input[type="checkbox"]:checked { background-color: var(--tg-crimson); border-color: var(--tg-crimson); }
+.markdown-rendered hr { border: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--tg-crimson), var(--tg-violet), var(--tg-magenta), transparent); }
+.theme-light .markdown-rendered hr { background: #000; height: 3px; }
+
+/* tags default (category tags are coloured in the generated css) */
+a.tag, .cm-hashtag {
+  border-radius: 999px;
+  padding: 0.05em 0.7em;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+
+/* properties (frontmatter) panel */
+.metadata-container { border: 1px solid var(--background-modifier-border); border-radius: var(--tg-radius); padding: 0.4em 0.8em; background: rgba(255, 255, 255, 0.02); }
+.metadata-property-key { color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75em; }
+
+/* callouts: default look, per-category colours in generated css */
+.callout { border-radius: var(--tg-radius); border-width: 0 0 0 4px; border-style: solid; border-color: rgb(var(--callout-color)); box-shadow: 0 0 18px rgba(var(--callout-color), 0.18); }
+.callout-title { font-weight: 800; letter-spacing: 0.03em; }
+.theme-light .callout { border: 2px solid #000; border-left-width: 8px; box-shadow: 4px 4px 0 #000; }
+
+/* backlinks / outgoing links panes */
+.backlink-pane .tree-item-self, .outgoing-link-pane .tree-item-self { border-radius: 6px; }
+.tree-item-flair { background: var(--tg-crimson); color: #fff; font-weight: 700; }
+
+/* canvas */
+.canvas-node-container { border-radius: var(--tg-radius); }

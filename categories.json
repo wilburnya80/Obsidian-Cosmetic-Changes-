@@ -1,0 +1,17 @@
+{
+  "_readme": "SINGLE SOURCE OF TRUTH for categories. Edit here, then run: node tools/vault.js build. Every category gets a folder, a tag, a CSS class (cat-<id>), a callout, a graph colour and a hub note. Colours are the colour-sorting system for the whole vault.",
+  "theme": "Tengen Entertainment District",
+  "categories": [
+    { "id": "hub",        "name": "Hubs",           "folder": "00 Hub",            "tag": "hub",        "color": "#ffe9a8", "icon": "🏯", "callout": "castle",      "blurb": "Entry points and indexes. Home links to every category hub; every hub links to every note in its category." },
+    { "id": "characters", "name": "Characters",     "folder": "01 Characters",     "tag": "characters", "color": "#ff2d55", "icon": "🗡️", "callout": "sword",       "blurb": "People: slayers, Hashira, allies, family." },
+    { "id": "demons",     "name": "Demons",         "folder": "02 Demons",         "tag": "demons",     "color": "#a855f7", "icon": "👹", "callout": "skull",       "blurb": "Enemies, bosses and their groups." },
+    { "id": "techniques", "name": "Techniques",     "folder": "03 Techniques",     "tag": "techniques", "color": "#ffc93c", "icon": "🌀", "callout": "zap",         "blurb": "Breathing styles, forms, blood demon arts, abilities." },
+    { "id": "weapons",    "name": "Weapons and Gear","folder": "04 Weapons and Gear","tag": "weapons",   "color": "#ff4fd8", "icon": "⚔️", "callout": "swords",      "blurb": "Blades, bombs, uniforms, trinkets." },
+    { "id": "locations",  "name": "Locations",      "folder": "05 Locations",      "tag": "locations",  "color": "#3ea6ff", "icon": "🏮", "callout": "map-pin",     "blurb": "Places, districts, buildings, rooftops." },
+    { "id": "events",     "name": "Arcs and Events","folder": "06 Arcs and Events","tag": "events",     "color": "#ff8a3d", "icon": "🎆", "callout": "flame",       "blurb": "Story arcs, battles, turning points." },
+    { "id": "factions",   "name": "Factions",       "folder": "07 Factions",       "tag": "factions",   "color": "#4ade80", "icon": "🏛️", "callout": "users",       "blurb": "Organisations, clans, households." },
+    { "id": "concepts",   "name": "Concepts",       "folder": "08 Concepts",       "tag": "concepts",   "color": "#2ee6d6", "icon": "💡", "callout": "lightbulb",   "blurb": "Ideas, rules, themes, lore mechanics." },
+    { "id": "journal",    "name": "Journal",        "folder": "09 Journal",        "tag": "journal",    "color": "#c9d4e8", "icon": "📓", "callout": "notebook-pen","blurb": "Daily notes, logs, session recaps." },
+    { "id": "sources",    "name": "Sources",        "folder": "10 Sources",        "tag": "sources",    "color": "#d9a066", "icon": "📚", "callout": "book-open",   "blurb": "Where facts came from: books, episodes, links." }
+  ]
+}

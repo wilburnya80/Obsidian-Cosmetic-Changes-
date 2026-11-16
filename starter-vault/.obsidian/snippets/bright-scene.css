@@ -1,0 +1,2 @@
+/* Bright scene: panes become very see-through so Tengen and the fireworks dominate. Good for presentations/screenshots. */
+body { --tg-pane-alpha: 0.38; --tg-side-alpha: 0.6; --tg-blur: 6px; }

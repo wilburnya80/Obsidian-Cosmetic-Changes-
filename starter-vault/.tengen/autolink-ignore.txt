@@ -1,0 +1,2 @@
+# Terms autolink must never turn into links (one per line, case-insensitive). Lines starting with # are comments.
+# Add generic words that happen to be note titles/aliases.

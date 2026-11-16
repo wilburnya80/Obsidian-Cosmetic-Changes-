@@ -1,0 +1,2 @@
+/* Readable mode: nearly opaque panes for long writing sessions; fireworks still play at the edges. */
+body { --tg-pane-alpha: 0.94; --tg-side-alpha: 0.96; --tg-blur: 0px; }

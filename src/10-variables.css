@@ -1,0 +1,165 @@
+/* ==========================================================================
+   TENGEN · ENTERTAINMENT DISTRICT  —  Obsidian theme
+   Dark  = "Night Parade"  (crimson / violet / magenta fireworks over Yoshiwara)
+   Light = "Manga Panel"   (ink, paper, screentone, one crimson accent)
+   Generated file: edit src/*.css or categories.json, then `node tools/vault.js build`.
+   ========================================================================== */
+
+:root {
+  --tg-crimson: #ff2d55;
+  --tg-violet: #8b3dff;
+  --tg-magenta: #ff4fd8;
+  --tg-gold: #ffc93c;
+  --tg-blue: #3ea6ff;
+  --tg-ink: #05020f;
+  --tg-pane-alpha: 0.6;       /* lower = more fireworks show through the editor */
+  --tg-side-alpha: 0.82;
+  --tg-blur: 3px;
+  --tg-radius: 10px;
+  --tg-glow: 0 0 14px rgba(255, 45, 85, 0.55);
+}
+
+.theme-dark {
+  color-scheme: dark;
+
+  --background-primary: #0d0720;
+  --background-primary-alt: #150b30;
+  --background-secondary: #0a0518;
+  --background-secondary-alt: #100826;
+  --background-modifier-hover: rgba(255, 79, 216, 0.12);
+  --background-modifier-active-hover: rgba(255, 79, 216, 0.2);
+  --background-modifier-border: #2d1b58;
+  --background-modifier-border-hover: #4a2a8a;
+  --background-modifier-border-focus: var(--tg-magenta);
+  --background-modifier-form-field: #130a2b;
+  --background-modifier-cover: rgba(5, 2, 15, 0.82);
+  --background-modifier-message: #1a0f3a;
+
+  --text-normal: #f3ebff;
+  --text-muted: #bba8e8;
+  --text-faint: #7f6bb0;
+  --text-on-accent: #ffffff;
+  --text-selection: rgba(255, 45, 85, 0.35);
+  --text-highlight-bg: rgba(255, 201, 60, 0.35);
+
+  --interactive-normal: #1c1040;
+  --interactive-hover: #271757;
+  --interactive-accent: #e0245e;
+  --interactive-accent-hover: #ff2d55;
+
+  --text-accent: #ff4fd8;
+  --text-accent-hover: #ff8aea;
+  --color-accent: #ff2d55;
+  --color-accent-1: #ff2d55;
+  --color-accent-2: #ff4fd8;
+  --link-color: #ff6fe0;
+  --link-color-hover: #ffc93c;
+  --link-unresolved-color: #9a86c9;
+  --link-external-color: #3ea6ff;
+  --tag-color: #ffc93c;
+  --tag-background: rgba(255, 201, 60, 0.12);
+
+  --h1-color: #ffc93c;
+  --h2-color: #ff4f7a;
+  --h3-color: #ff4fd8;
+  --h4-color: #b88bff;
+  --h5-color: #3ea6ff;
+  --h6-color: #2ee6d6;
+  --bold-color: #fff4c2;
+  --italic-color: #ffd2f5;
+
+  --blockquote-border-color: #ff2d55;
+  --blockquote-background-color: rgba(255, 45, 85, 0.07);
+  --code-background: #130a2b;
+  --code-normal: #ffd2f5;
+  --hr-color: #4a2a8a;
+
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb-bg: #3b2275;
+  --scrollbar-active-thumb-bg: #ff2d55;
+
+  --titlebar-background: #07030f;
+  --titlebar-background-focused: #07030f;
+  --tab-container-background: rgba(7, 3, 15, 0.82);
+  --ribbon-background: rgba(7, 3, 15, 0.9);
+  --ribbon-background-collapsed: transparent;
+  --nav-item-background-hover: rgba(255, 79, 216, 0.12);
+  --nav-item-background-active: rgba(255, 45, 85, 0.2);
+  --nav-item-color-active: #fff;
+  --graph-line: #3b2275;
+  --graph-node: #b88bff;
+  --graph-node-unresolved: #6a5898;
+  --graph-node-focused: #ffc93c;
+  --graph-node-tag: #ffc93c;
+  --graph-node-attachment: #3ea6ff;
+}
+
+.theme-light {
+  color-scheme: light;
+
+  --background-primary: #f7f2e8;
+  --background-primary-alt: #eee7d8;
+  --background-secondary: #ece4d2;
+  --background-secondary-alt: #e3d9c3;
+  --background-modifier-hover: rgba(214, 0, 42, 0.08);
+  --background-modifier-active-hover: rgba(214, 0, 42, 0.15);
+  --background-modifier-border: #111111;
+  --background-modifier-border-hover: #d6002a;
+  --background-modifier-border-focus: #d6002a;
+  --background-modifier-form-field: #fffaf0;
+  --background-modifier-cover: rgba(247, 242, 232, 0.88);
+
+  --text-normal: #0e0e10;
+  --text-muted: #3b3b44;
+  --text-faint: #7a7a86;
+  --text-on-accent: #ffffff;
+  --text-selection: rgba(214, 0, 42, 0.25);
+  --text-highlight-bg: rgba(255, 201, 60, 0.6);
+
+  --interactive-normal: #fffaf0;
+  --interactive-hover: #f0e6cf;
+  --interactive-accent: #d6002a;
+  --interactive-accent-hover: #ff1a47;
+
+  --text-accent: #d6002a;
+  --text-accent-hover: #ff1a47;
+  --color-accent: #d6002a;
+  --color-accent-1: #d6002a;
+  --link-color: #b3001f;
+  --link-color-hover: #000000;
+  --link-unresolved-color: #7a7a86;
+  --tag-color: #111111;
+  --tag-background: #ffd84d;
+
+  --h1-color: #000000;
+  --h2-color: #d6002a;
+  --h3-color: #111111;
+  --h4-color: #5a1ea8;
+  --h5-color: #1a5fb4;
+  --h6-color: #0f766e;
+  --bold-color: #000000;
+
+  --blockquote-border-color: #000000;
+  --blockquote-background-color: rgba(0, 0, 0, 0.04);
+  --code-background: #fffaf0;
+  --code-normal: #7a0016;
+  --hr-color: #000000;
+
+  --titlebar-background: #ece4d2;
+  --titlebar-background-focused: #ece4d2;
+  --tab-container-background: rgba(236, 228, 210, 0.9);
+  --ribbon-background: rgba(236, 228, 210, 0.95);
+  --nav-item-background-hover: rgba(214, 0, 42, 0.08);
+  --nav-item-background-active: rgba(214, 0, 42, 0.16);
+  --graph-line: #111111;
+  --graph-node: #111111;
+  --graph-node-focused: #d6002a;
+}
+
+/* Fonts: safe system stacks. Install "Bangers"/"Oswald" locally for the full comic feel. */
+body {
+  --font-interface-theme: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-text-theme: "Georgia", "Iowan Old Style", "Palatino Linotype", serif;
+  --font-monospace-theme: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace;
+  --tg-display: "Bangers", "Oswald", "Impact", "Arial Narrow Bold", sans-serif;
+}
