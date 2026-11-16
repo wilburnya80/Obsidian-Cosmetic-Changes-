@@ -1,6 +1,6 @@
 # Tengen Pixel — pixel-art Obsidian theme + Claude-ready vault kit
 
-**Chibi pixel-art Tengen Uzui (traced from your reference sprite) on a Yoshiwara rooftop, both cleavers raised, animated pixel fireworks bursting in a navy-to-electric-blue-and-violet night sky.**
+**Pixel-art Tengen Uzui as a dark silhouette on a Yoshiwara rooftop, dual-wielding his two chained black-and-orange cleavers, with animated pixel fireworks bursting in a navy-to-electric-blue-and-violet night sky.**
 Built with the same technique as the pixel theme in `dnd-game-brain` (pixel SVG scene behind translucent panes, Pixelify Sans headings, hard 3px borders, block shadows).
 Every note belongs to a **colour-coded category**, and a built-in toolkit lets **Claude Code in the terminal** keep the vault ultra-densely cross-linked.
 
@@ -87,7 +87,7 @@ Anything that edits existing notes is a **dry run unless you pass `--write`**.
 
 ## Tweaking the look
 
-* Scene: `src/pixel-scene.js` (sky palette, firework list, smoke, sparkles, roof) and `src/tengen-sprite.json` (the chibi Tengen, traced from your reference image — swap the rows to change him). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
+* Scene: `src/pixel-scene.js` (sky palette, firework list, smoke, sparkles, roof) — it also draws Tengen and the cleavers (`makeSword()`: blade, orange edge, hole, kanji, guard, grip, pommel; `SANG` sets the raise angle). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
 * Snippets (Settings → Appearance → CSS snippets): `no-scene` hides the animation, `bright-scene` makes panes see-through, `readable-mode` makes them nearly opaque.
 * After editing run `node tools/vault.js build`, then `node tools/vault.js install starter-vault` to sync the sample vault.
 
