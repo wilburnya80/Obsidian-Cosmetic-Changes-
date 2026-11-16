@@ -94,70 +94,50 @@ out.push(rect(CX - 10, APEX + 2, 20, 2, '#b8860b'));
 /* foreground rooftops, left + right edges */
 [[0, 238, 130], [350, 252, 130]].forEach(([x, y, w]) => { out.push(rect(x, y, w, 40, '#150826') + rect(x, y, w, 3, '#2d1259')); for (let k = x; k < x + w; k += 6) out.push(rect(k, y + 3, 2, 3, '#3b1d6a')); });
 
-/* ---------------- TENGEN sprite (code-drawn, auto-outlined) ---------------- */
-const TW = 46, TH = 56;
-const g = Array.from({ length: TH }, () => Array(TW).fill('.'));
-const put = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && x < TW && y >= 0 && y < TH) g[y][x] = c; };
-const box = (x, y, w, h, c) => { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) put(x + i, y + j, c); };
+/* ---------------- TENGEN: chibi sprite traced from the user's reference (src/tengen-sprite.json) + cleavers ---------------- */
+const SPR = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'tengen-sprite.json'), 'utf8'));
+const MX = 16, MY = 8;                                   // margins for the raised cleavers
+const GW = SPR.rows[0].length + MX * 2, GH = SPR.rows.length + MY;
+const grid = Array.from({ length: GH }, () => Array(GW).fill('.'));
+const put = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && x < GW && y >= 0 && y < GH) grid[y][x] = c; };
 function line(x0, y0, x1, y1, th, c) {
   const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
   for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n, y = y0 + ((y1 - y0) * i) / n; for (let a = 0; a < th; a++) for (let b = 0; b < th; b++) put(x - (th >> 1) + a, y - (th >> 1) + b, c); }
 }
-const cx = 23;
-/* chain behind everything: dashed sag between pommels */
-for (let x = 9; x <= 37; x++) { const t = (x - 23) / 14; const y = 27 + 13 * (1 - t * t); if (x % 2 === 0) put(x, y, 'C'); else put(x, y + 1, 'C'); }
-/* blades */
-function blade(hx, hy, tx, ty, outerSign) {
-  line(hx, hy, tx, ty, 4, 'b');
-  line(hx, hy, tx, ty, 2, 'B');
-  line(hx + outerSign * 2, hy, tx + outerSign * 2, ty, 1, 'H');
-  line(hx + 0, hy, hx + 0, hy, 1, 'B');
+const HAND_L = [MX + 8, MY + 38], HAND_R = [MX + 24, MY + 38];
+const TIP_L = [1, MY + 12], TIP_R = [GW - 2, MY + 12];
+function cleaver(h, t, outer) {
+  line(h[0], h[1], t[0], t[1], 3, 'x');          // blade body
+  line(h[0], h[1], t[0], t[1], 1, 'y');          // light core
+  line(h[0] + outer * 2, h[1] - 1, t[0] + outer * 2, t[1] - 1, 1, 'z');   // bright cutting edge
+  const gx = h[0] - (outer * 0), gy = h[1];
+  for (let i = -3; i <= 3; i++) put(gx + i, gy, 'w');            // guard
+  for (let i = -2; i <= 2; i++) put(gx + i, gy + 1, 'w');
+  put(gx, gy + 2, 'w'); put(gx - 1, gy + 3, 'w'); put(gx + 1, gy + 3, 'w');   // pommel ring
 }
-blade(8, 22, 3, 1, -1); blade(38, 22, 43, 1, 1);
-/* guards + pommel rings */
-box(5, 22, 7, 2, 'G'); box(34, 22, 7, 2, 'G'); put(8, 25, 'G'); put(9, 25, 'G'); put(37, 25, 'G'); put(38, 25, 'G');
-/* legs (wide stance) + hakama flare */
-box(15, 42, 7, 11, 'D'); box(25, 42, 7, 11, 'D'); box(14, 46, 2, 7, 'd'); box(31, 46, 2, 7, 'd');
-box(17, 44, 1, 8, 'd'); box(28, 44, 1, 8, 'd');
-box(15, 53, 7, 2, 'D'); box(25, 53, 7, 2, 'D'); box(14, 54, 3, 1, 'G'); box(30, 54, 3, 1, 'G');
-for (let y = 36; y < 43; y++) { const hw = 6 + (y - 36); for (let x = cx - hw; x <= cx + hw; x++) put(x, y, (x + y) % 5 === 0 ? 'd' : 'D'); }
-/* torso */
-for (let y = 24; y < 37; y++) { const hw = 9 - Math.floor((y - 24) / 3.3); for (let x = cx - hw; x <= cx + hw; x++) put(x, y, 'D'); }
-for (let y = 24; y < 30; y++) { const hw = 4 - Math.floor((y - 24) / 1.6); for (let x = cx - hw; x <= cx + hw; x++) put(x, y, 'S'); } // chest V
-box(cx - 1, 29, 3, 6, 's');
-box(cx - 8, 25, 3, 2, 'G'); box(cx + 6, 25, 3, 2, 'G');                                                                // shoulder guards
-box(cx - 6, 35, 13, 2, 'G'); box(cx - 1, 35, 3, 3, 'R');                                                              // belt + knot
-/* arms (muscular, raised to pommels) */
-line(15, 26, 9, 21, 3, 'S'); line(31, 26, 37, 21, 3, 'S');
-line(14, 27, 10, 23, 1, 's'); line(32, 27, 36, 23, 1, 's');
-box(7, 21, 4, 3, 'A'); box(35, 21, 4, 3, 'A');                                                                         // wrist guards
-put(8, 22, 'R'); put(37, 22, 'R');
-/* head */
-for (let y = 12; y <= 22; y++) { const t = (y - 17) / 5.5; const hw = Math.round(4.4 * Math.sqrt(Math.max(0, 1 - t * t))); for (let x = cx - hw; x <= cx + hw; x++) put(x, y, 'S'); }
-box(cx - 4, 17, 2, 1, 'K'); box(cx + 3, 17, 2, 1, 'K'); box(cx - 4, 18, 2, 1, 'R'); box(cx + 3, 18, 2, 1, 'R'); box(cx - 1, 21, 3, 1, 's');
-box(cx - 1, 22, 3, 2, 'S');
-/* hair: white spikes */
-for (let y = 10; y <= 13; y++) for (let x = cx - 5; x <= cx + 5; x++) put(x, y, y > 11 && (x < cx - 3 || x > cx + 3) ? 'W' : 'W');
-[[cx - 5, 5], [cx - 2, 3], [cx + 1, 4], [cx + 4, 6], [cx + 6, 9], [cx - 7, 9]].forEach(([sx, top]) => { for (let y = top; y <= 10; y++) { const w = Math.max(1, Math.round((y - top) / 2.2)); for (let x = sx - (w >> 1); x <= sx + (w >> 1); x++) put(x, y, (y + x) % 4 === 0 ? 'w' : 'W'); } });
-box(cx - 6, 12, 2, 5, 'W'); box(cx + 5, 12, 2, 5, 'W');
-/* jewelled headband */
-box(cx - 5, 12, 11, 2, 'G'); put(cx, 12, 'R'); put(cx, 13, 'R'); put(cx - 5, 14, 'J'); put(cx + 5, 14, 'J'); put(cx - 5, 15, 'G'); put(cx + 5, 15, 'G');
-/* outline pass */
-const filled = (x, y) => y >= 0 && y < TH && x >= 0 && x < TW && g[y][x] !== '.';
-const o = g.map((r) => r.slice());
-for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) if (g[y][x] === '.' && (filled(x - 1, y) || filled(x + 1, y) || filled(x, y - 1) || filled(x, y + 1))) o[y][x] = 'K';
-const SPAL = { K: '#120a24', W: '#ffffff', w: '#cdbcff', G: '#ffc83d', R: '#e74c3c', S: '#f0c09a', s: '#c98f6c', D: '#2a1f4a', d: '#43337a', A: '#8e44ad', B: '#f1e8ff', b: '#8c78d6', H: '#ffffff', C: '#c9b8ff', J: '#5ff3ff' };
-const SCALE = 3, TX = CX - Math.round((TW * SCALE) / 2), TY = APEX + 2 - TH * SCALE;
+cleaver(HAND_L, TIP_L, -1); cleaver(HAND_R, TIP_R, 1);
+/* chain dangling between the pommels (behind the legs) */
+for (let x = HAND_L[0]; x <= HAND_R[0]; x++) { const t = (x - (HAND_L[0] + HAND_R[0]) / 2) / ((HAND_R[0] - HAND_L[0]) / 2); if (x % 2 === 0) put(x, HAND_L[1] + 4 + 3 * (1 - t * t), 'v'); }
+/* the traced sprite goes on top */
+SPR.rows.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.') grid[y + MY][x + MX] = ch; }));
+/* outline cleavers only (sprite already has its own black outline) */
+const isBlade = (c) => 'xyzwv'.includes(c);
+const snap = grid.map((r) => r.slice());
+for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (grid[y][x] === '.') {
+  const nb = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].some(([a, b]) => a >= 0 && b >= 0 && a < GW && b < GH && isBlade(snap[b][a]));
+  if (nb) grid[y][x] = 'B';
+}
+const SPAL = Object.assign({ x: '#8c78d6', y: '#f1e8ff', z: '#ffffff', w: '#ffc83d', v: '#c9b8ff' }, SPR.pal);
+const SCALE = 3, TX = CX - Math.round((GW * SCALE) / 2), TY = APEX + 2 - GH * SCALE;
 const sp = [];
-for (let y = 0; y < TH; y++) for (let x = 0; x < TW; x++) {
-  const ch = o[y][x]; if (ch === '.') continue;
-  let run = 1; while (x + run < TW && o[y][x + run] === ch) run++;
+for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+  const ch = grid[y][x]; if (ch === '.') continue;
+  let run = 1; while (x + run < GW && grid[y][x + run] === ch) run++;
   sp.push(rect(TX + x * SCALE, TY + y * SCALE, run * SCALE, SCALE, SPAL[ch])); x += run - 1;
 }
-/* sword-tip glints */
-const glint = (gx, gy, b) => `<g fill='#ffffff' opacity='0'>${rect(gx - 1, gy - 4, 2, 8, '#ffffff')}${rect(gx - 4, gy - 1, 8, 2, '#ffffff')}<animate attributeName='opacity' values='0;1;0;0' keyTimes='0;.08;.16;1' dur='3.2s' begin='${b}s' repeatCount='indefinite'/></g>`;
+const glint = (gx, gy, b) => `<g opacity='0'>${rect(gx - 1, gy - 4, 2, 8, '#ffffff')}${rect(gx - 4, gy - 1, 8, 2, '#ffffff')}<animate attributeName='opacity' values='0;1;0;0' keyTimes='0;.08;.16;1' dur='3.2s' begin='${b}s' repeatCount='indefinite'/></g>`;
 out.push(`<g>${sp.join('')}<animateTransform attributeName='transform' type='translate' values='0 0;0 -1;0 0' dur='1.6s' repeatCount='indefinite'/></g>`);
-out.push(glint(TX + 3 * SCALE, TY + 1 * SCALE, 0.4) + glint(TX + 43 * SCALE, TY + 1 * SCALE, 1.6));
+out.push(glint(TX + TIP_L[0] * SCALE, TY + TIP_L[1] * SCALE, 0.4) + glint(TX + TIP_R[0] * SCALE, TY + TIP_R[1] * SCALE, 1.6));
 
 /* a few drifting embers */
 for (let k = 0; k < 14; k++) { const x = ri(0, SW), d = (5 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='1' fill='#ffb347'><animateTransform attributeName='transform' type='translate' values='${x} 260; ${x + ri(-14, 14)} 120' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
