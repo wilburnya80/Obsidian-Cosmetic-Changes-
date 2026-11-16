@@ -138,7 +138,7 @@ function buildThemeCss() {
 }
 
 function manifest() {
-  return JSON.stringify({ name: THEME_NAME, version: '1.0.0', minAppVersion: '1.0.0', author: 'Tengen Pixel', authorUrl: 'https://github.com/wilburnya80/Obsidian-Cosmetic-Changes-' }, null, 2) + '\n';
+  return JSON.stringify({ name: THEME_NAME, version: '1.0.0', minAppVersion: '1.0.0', author: 'Tengen Pixel' }, null, 2) + '\n';
 }
 
 function writeTheme(vault) {
