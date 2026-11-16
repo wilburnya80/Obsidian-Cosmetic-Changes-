@@ -208,15 +208,16 @@ if (CH.id === 'tengen') {
   }
   const snapG = grid.map((r) => r.slice());
   for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (!snapG[y][x] && [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].some(([a, b]) => a >= 0 && b >= 0 && a < GW && b < GH && mask[b][a])) grid[y][x] = '#120a24';
-  const TX = CX - Math.round(GW / 2), TY = APEX + 2 - GH, sp = [];
+  const SC = 1.3;                                                  // same on-screen pixel density as Tengen's source art -> same visual height
+  const TX = CX - (GW * SC) / 2, TY = APEX + 2 - GH * SC, sp = [];
   for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
     const c = grid[y][x]; if (!c) continue;
     let run = 1; while (x + run < GW && grid[y][x + run] === c) run++;
-    sp.push(rect(TX + x, TY + y, run, 1, c)); x += run - 1;
+    sp.push(rect(+(TX + x * SC).toFixed(2), +(TY + y * SC).toFixed(2), +(run * SC + 0.04).toFixed(2), +(SC + 0.04).toFixed(2), c)); x += run - 1;
   }
   out.push(`<g>${sp.join('')}<animateTransform attributeName='transform' type='translate' values='0 0;0 -1;0 0' dur='1.6s' repeatCount='indefinite'/></g>`);
   const tx = ORG[0] + (KH - 1) * Math.sin(t), ty = ORG[1] - (KH - 1) * Math.cos(t);
-  out.push(`<g opacity='0'>${rect(TX + tx - 1, TY + ty - 3, 2, 6, '#ffffff')}${rect(TX + tx - 3, TY + ty - 1, 6, 2, '#ffffff')}<animate attributeName='opacity' values='0;1;0;0' keyTimes='0;.08;.16;1' dur='3.2s' begin='0.6s' repeatCount='indefinite'/></g>`);
+  out.push(`<g opacity='0'>${rect(TX + tx * SC - 1, TY + ty * SC - 3, 2, 6, '#ffffff')}${rect(TX + tx * SC - 3, TY + ty * SC - 1, 6, 2, '#ffffff')}<animate attributeName='opacity' values='0;1;0;0' keyTimes='0;.08;.16;1' dur='3.2s' begin='0.6s' repeatCount='indefinite'/></g>`);
 }
 
 /* a few drifting embers */

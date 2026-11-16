@@ -17,7 +17,7 @@ const META = {
 };
 
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(ROOT, 'src', f), 'utf8'));
-function gridFromSprite(sp) { return sp.rows.map((row) => [...row].map((ch) => (ch === '.' ? null : sp.pal[ch] || null))); }
+function gridFromSprite(sp) { return sp.rows.map((row) => (Array.isArray(row) ? row : [...row]).map((ch) => (ch === '.' ? null : sp.pal[ch] || null))); }
 function outline(g) {                                         // pad by one cell, then draw a dark outline around the silhouette
   const H = g.length + 2, W = g[0].length + 2;
   const p = Array.from({ length: H }, (_, y) => Array.from({ length: W }, (_, x) => (y >= 1 && y <= g.length && x >= 1 && x <= g[0].length ? g[y - 1][x - 1] : null)));
