@@ -186,7 +186,8 @@ if (CH.id === 'tengen') {
 } else {
   const chibi = require('../tools/chibi.js');
   const g = chibi.gridFor(CH.id);                                   // 31 x 47 colour grid (same body as Tengen's sprite)
-  const MX = 12, MY = 16, GW = 31 + MX * 2, GH = 47 + MY;
+  const SWc = g[0].length, SHc = g.length;                        // traced sprites vary in size
+  const MX = 12, MY = 16, GW = SWc + MX * 2, GH = SHc + MY;
   const grid = Array.from({ length: GH }, () => Array(GW).fill(null));
   g.forEach((row, y) => row.forEach((c, x) => { if (c) grid[y + MY][x + MX] = c; }));
   const S = CH.sword, KW = 7, KH = 36, KC = 3;
@@ -199,7 +200,7 @@ if (CH.id === 'tengen') {
   for (let y = 27; y < 33; y++) { L[y][KC - 1] = y % 2 ? '#1a1426' : '#f2f2f2'; L[y][KC] = y % 2 ? '#f2f2f2' : '#1a1426'; }   // wrapped grip
   L[33][KC - 1] = '#ffd24a'; L[33][KC] = '#ffd24a'; L[34][KC - 1] = '#a8841a'; L[34][KC] = '#a8841a';
   const mask = Array.from({ length: GH }, () => Array(GW).fill(false));
-  const ORG = [24 + MX + 1, 38 + MY + 5], DEG = 36, t = (DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
+  const ORG = [Math.round(SWc * 0.8) + MX + 1, Math.round(SHc * 0.66) + MY + 5], DEG = 36, t = (DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
   for (let Y = 0; Y < GH; Y++) for (let X = 0; X < GW; X++) {
     const a = X - ORG[0], b = Y - ORG[1];
     const lx = Math.round(a * cs + b * sn + KC), ly = Math.round(-a * sn + b * cs + KH - 1);
