@@ -75,6 +75,21 @@ input[type="checkbox"]:checked { background-color: #8a2be2; }
 .suggestion-item.is-selected, .menu-item:hover { background: rgba(255, 79, 160, 0.3); }
 .graph-controls { background-color: rgba(8, 5, 48, 0.94) !important; border: 3px solid #ffb347 !important; }
 
+/* ---------------- mobile (Obsidian phone/tablet app adds body.is-mobile) ---------------- */
+body.is-mobile { --tg-pane: rgba(8, 5, 38, 0.84); --tg-side: rgba(6, 3, 28, 0.94); }
+body.is-mobile .workspace-drawer, body.is-mobile .workspace-drawer-inner, body.is-mobile .workspace-drawer .workspace-leaf-content { background-color: rgba(6, 3, 28, 0.96) !important; border-color: #3d2fae; }
+body.is-mobile .mobile-navbar { background-color: rgba(4, 2, 22, 0.97) !important; border-top: 3px solid #3d2fae; }
+body.is-mobile .mobile-navbar-action, body.is-mobile .mobile-navbar-action svg { color: #ffb347; }
+body.is-mobile .view-header-title { font-family: var(--tg-pixel); }
+body.is-mobile .inline-title { font-size: 1.8em; }
+body.is-mobile .markdown-rendered h1 { font-size: 1.6em; }
+body.is-mobile .callout { box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5); }
+body.is-mobile .markdown-rendered table { display: block; overflow-x: auto; }
+body.is-mobile button, body.is-mobile .clickable-icon { min-height: 40px; }
+
+/* pixel character portraits embedded in notes (chibi-*.svg) */
+.markdown-rendered img[src*="chibi"], .markdown-source-view img[src*="chibi"] { image-rendering: pixelated; display: block; margin: 0.4em auto; filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.55)); }
+
 
 /* ==========================================================================
    TYPOGRAPHY — pixel headings, RPG dialogue-box callouts, block-shadow tables
