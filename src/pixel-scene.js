@@ -167,7 +167,7 @@ out.push(rect(CX - 10, APEX + 2, 20, 2, '#4a56d8'));
   /* the two small cleavers, held at the cuffs */
   stamp(SWORD.L, ORG_L[0], ORG_L[1], -SANG); stamp(SWORD.R, ORG_R[0], ORG_R[1], SANG);
 
-  const SCALE = 2, TX = CX - Math.round((GW * SCALE) / 2), TY = APEX + 2 - GH * SCALE;
+  const SCALE = 1, TX = CX - Math.round((GW * SCALE) / 2), TY = APEX + 2 - GH * SCALE;
   const sp = [];
   for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
     const ch = grid[y][x]; if (ch === '.' || !SPAL[ch]) continue;
