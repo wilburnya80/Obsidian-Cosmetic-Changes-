@@ -116,7 +116,7 @@ function sceneDataUri(animated) {
   return `"data:image/svg+xml;base64,${Buffer.from(buildSceneSvg(animated), 'utf8').toString('base64')}"`;
 }
 
-// Same rule shape as the proven dnd-pixel snippet: fixed, behind everything, pixel-crisp.
+// Scene rule: fixed, behind everything, pixel-crisp.
 function sceneRule(animated = false) {
   return `body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; image-rendering: pixelated; background: #0d0720 url(${sceneDataUri(animated)}) right bottom / cover no-repeat; }`;
 }

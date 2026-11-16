@@ -1,5 +1,5 @@
 'use strict';
-/* Pixel-art scene generator (same technique as dnd-game-brain/_builder/pixelart.ps1):
+/* Pixel-art scene generator:
    480 x 270 units, 1 unit = 1 pixel, shape-rendering=crispEdges, SMIL animation.
    Tengen is built from code-drawn sprite pixels, auto-outlined, standing on a roof peak,
    both chained cleavers raised, pixel fireworks bursting behind him. */

@@ -1,7 +1,7 @@
 <!-- tengen:start -->
 # Tengen Pixel — vault instructions for Claude
 
-This Obsidian vault uses the **Tengen Pixel** theme: a pixel-art Tengen Uzui on a Yoshiwara rooftop, both cleavers raised, animated pixel fireworks behind the panes. The look follows the pixel theme of the owner's DND vault.
+This Obsidian vault uses the **Tengen Pixel** theme: a pixel-art Tengen Uzui on a Yoshiwara rooftop, both cleavers raised, animated pixel fireworks behind the panes.
 
 You (Claude) are expected to **organise, link and restyle this vault** using the rules and tools below. The owner's notes are theirs: never delete or rewrite their prose, never move a file without saying so first, and run anything that edits existing notes as a **dry run before `--write`**.
 
