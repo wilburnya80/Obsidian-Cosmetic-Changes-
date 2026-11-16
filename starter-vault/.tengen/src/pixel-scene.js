@@ -118,79 +118,56 @@ out.push(rect(CX - 10, APEX + 2, 20, 2, '#4a56d8'));
 /* foreground rooftops, left + right edges */
 [[0, 238, 130], [350, 252, 130]].forEach(([x, y, w]) => { out.push(rect(x, y, w, 40, '#05041a') + rect(x, y, w, 3, '#3a3ad0')); for (let k = x; k < x + w; k += 6) out.push(rect(k, y + 3, 2, 3, '#14127a')); });
 
-/* ---------------- TENGEN: dark back-view silhouette on the roof peak, dual-wielding his chained cleavers ---------------- */
+/* ---------------- TENGEN: the user's chibi sprite (src/tengen-sprite.json) dual-wielding small versions of his chained cleavers ---------------- */
 {
-  const GW = 74, GH = 78;
-  const SPAL = { N: '#0a0730', R: '#7f9bff', W: '#f4f0ff', G: '#ffc83d', k: '#0b0b12', o: '#ff9a1f', O: '#ffc15a', w: '#ffe9c4', g: '#ffd24a', e: '#1fb27c', E: '#7af0c8', r: '#d81e3a', q: '#8e1226', c: '#a9afba', C: '#4a4f5a', p: '#d9a520', P: '#8a5a10' };
+  const SPR = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'tengen-sprite.json'), 'utf8'));
+  const MX = 14, MY = 4;
+  const GW = SPR.rows[0].length + MX * 2, GH = SPR.rows.length + MY;
+  const SPAL = Object.assign({ k: '#0b0b12', o: '#ff9a1f', O: '#ffc15a', w: '#ffe9c4', g: '#ffd24a', e: '#1fb27c', E: '#7af0c8', r: '#d81e3a', q: '#8e1226', c: '#a9afba', C: '#4a4f5a', p: '#d9a520', P2: '#8a5a10', x: '#8a5a10' }, SPR.pal);
   const grid = Array.from({ length: GH }, () => Array(GW).fill('.'));
   const put = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && x < GW && y >= 0 && y < GH) grid[y][x] = c; };
-  const line = (x0, y0, x1, y1, c, th = 1) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n, y = y0 + ((y1 - y0) * i) / n; for (let a = 0; a < th; a++) for (let b = 0; b < th; b++) put(x + a, y + b, c); } };
-  const box = (x, y, w, h, c) => { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) put(x + i, y + j, c); };
 
-  /* ---- one cleaver in local coordinates: tip at row 0, pommel at the last row (reference photo) ---- */
-  const SW_W = 15, SW_H = 51, BLADE = 36;
+  /* ---- small cleaver in local coordinates (tip row 0, pommel last row): black blade, wavy orange edge, hole, kanji, green guard, red/green grip, gold pommel ---- */
+  const BLADE = 18, GRIP = 6, SW_W = 11, SW_H = BLADE + GRIP + 5, CXL = 5;
   function makeSword(mirror) {
     const L = Array.from({ length: SW_H }, () => Array(SW_W).fill('.'));
     for (let y = 0; y < BLADE; y++) {
-      const width = Math.min(11, Math.round(1.5 + y * 0.6)) - (y > 30 ? Math.round((y - 30) * 0.45) : 0);
-      const xl = 1 + Math.round(4.5 * Math.pow(1 - y / BLADE, 2));
-      const wave = Math.round(1.6 * Math.sin(y * 0.6 + 0.4));
-      for (let d = 0; d < width; d++) {
-        let c = 'k';
-        if (d === 0) c = 'w';
-        else if (d < 3 + wave) c = d === 1 ? 'O' : 'o';
-        L[y][xl + d] = c;
-      }
-      if (y >= 25 && y <= 31) for (let d = 0; d < width; d++) { const hx = 3, hy = 28; if ((d - hx) * (d - hx) + (y - hy) * (y - hy) <= 5) L[y][xl + d] = '.'; }   // round hole in the blade
-      if (y >= 27 && y <= 33 && width > 6) { L[y][xl + 5 + (y % 2)] = 'g'; if (y % 2 === 0) L[y][xl + 7] = 'g'; }   // gold kanji
+      const width = Math.min(6, Math.round(1 + y * 0.42)) - (y > 14 ? Math.round((y - 14) * 0.4) : 0);
+      const xl = 1 + Math.round(2.5 * Math.pow(1 - y / BLADE, 2));
+      const wave = Math.round(0.9 * Math.sin(y * 0.8 + 0.4));
+      for (let d = 0; d < width; d++) L[y][xl + d] = d === 0 ? 'w' : d < 2 + wave ? 'o' : 'k';
+      if (y >= 12 && y <= 15) for (let d = 0; d < width; d++) if ((d - 2) * (d - 2) + (y - 13.5) * (y - 13.5) <= 2.4) L[y][xl + d] = '.';   // hole
+      if (y === 14 || y === 16) if (width > 3) L[y][xl + 4] = 'g';                                                                          // kanji
     }
-    const cx = 6;
-    for (let i = -5; i <= 5; i++) L[BLADE][cx + i] = Math.abs(i) > 3 ? 'e' : 'E';                       // green guard
-    for (let i = -4; i <= 4; i++) L[BLADE + 1][cx + i] = i % 2 === 0 ? 'e' : 'p';
-    for (let y = BLADE + 2; y < BLADE + 12; y++) for (let i = -2; i <= 1; i++) L[y][cx + i] = ((y + i) & 1) ? 'r' : 'e';  // red grip, green diamonds
-    for (let y = BLADE + 2; y < BLADE + 12; y++) { L[y][cx - 3] = 'q'; L[y][cx + 2] = 'q'; }
-    for (let i = -3; i <= 2; i++) { L[BLADE + 12][cx + i] = 'p'; L[BLADE + 13][cx + i] = 'P'; }           // gold pommel
-    L[BLADE + 14][cx - 1] = 'p'; L[BLADE + 14][cx] = 'p';
+    for (let i = -3; i <= 3; i++) L[BLADE][CXL + i] = Math.abs(i) > 2 ? 'e' : 'E';                       // guard
+    for (let y = BLADE + 1; y < BLADE + 1 + GRIP; y++) for (let i = -1; i <= 0; i++) L[y][CXL + i] = ((y + i) & 1) ? 'r' : 'e';  // grip
+    for (let y = BLADE + 1; y < BLADE + 1 + GRIP; y++) { L[y][CXL - 2] = 'q'; L[y][CXL + 1] = 'q'; }
+    for (let i = -2; i <= 1; i++) { L[BLADE + 1 + GRIP][CXL + i] = 'p'; L[BLADE + 2 + GRIP][CXL + i] = 'x'; }                              // pommel
     return mirror ? L.map((r) => r.slice().reverse()) : L;
   }
   const SWORD = { L: makeSword(false), R: makeSword(true) };
-  function stamp(L, ox, oy, deg) {                       // draw a local sprite rotated about its pommel (ox, oy), nearest-neighbour
+  function stamp(L, ox, oy, deg) {
     const t = (deg * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
     for (let Y = 0; Y < GH; Y++) for (let X = 0; X < GW; X++) {
       const a = X - ox, b = Y - oy;
-      const lx = Math.round(a * cs + b * sn + 6), ly = Math.round(-a * sn + b * cs + SW_H - 1);
+      const lx = Math.round(a * cs + b * sn + CXL), ly = Math.round(-a * sn + b * cs + SW_H - 1);
       if (lx >= 0 && lx < SW_W && ly >= 0 && ly < SW_H && L[ly][lx] !== '.') grid[Y][X] = L[ly][lx];
     }
   }
   const tipOf = (ox, oy, deg) => { const t = (deg * Math.PI) / 180; return [ox + (SW_H - 1) * Math.sin(t), oy - (SW_H - 1) * Math.cos(t)]; };
 
-  const CXF = 37, B0 = 38;                                // figure centre column / top row of the body block
-  const HAND_L = [20, 49], HAND_R = [54, 49];
-  const SANG = 20;
-  const ORG_L = [HAND_L[0] - 1, HAND_L[1] + 6], ORG_R = [HAND_R[0] + 1, HAND_R[1] + 6];
+  /* hands = the blue wrist cuffs of the chibi (sprite cols ~8 and ~24, row ~38) */
+  const HAND_L = [MX + 8, MY + 38], HAND_R = [MX + 24, MY + 38], SANG = 38;
+  const ORG_L = [HAND_L[0] - 1, HAND_L[1] + 4], ORG_R = [HAND_R[0] + 1, HAND_R[1] + 4];
 
-  /* chain between the two pommels, hanging in loose links */
-  const linkCols = ['c', 'C'];
-  for (let i = 0; i <= 60; i++) { const t = i / 60; const x = ORG_L[0] + (ORG_R[0] - ORG_L[0]) * t; const y = ORG_L[1] + 2 + 18 * Math.sin(Math.PI * t) ; if (i % 2 === 0) { put(x, y, linkCols[(i / 2) % 2]); put(x + 1, y, linkCols[(i / 2) % 2]); put(x, y + 1, linkCols[((i / 2) + 1) % 2]); } }
-
-  /* body (silhouette) */
-  const by = (v) => B0 + v;
-  for (let y = 13; y < 26; y++) { const hw = 7 - Math.floor((y - 13) / 3.2); box(CXF - hw, by(y - 4), hw * 2, 1, 'N'); }                         // torso
-  for (let y = 6; y <= 12; y++) { const t = (y - 9) / 3.6; const hw = Math.round(3.4 * Math.sqrt(Math.max(0, 1 - t * t))); box(CXF - hw, by(y - 4), hw * 2 + 1, 1, 'N'); } // head
-  box(CXF - 3, by(2), 7, 1, 'G');                                                                                                            // headband
-  [[-3, -1], [0, -3], [3, -1], [-6, 0], [6, 0]].forEach(([dx, top]) => line(CXF + dx, by(1), CXF + dx, by(top + 2), 'W'));                  // white hair spikes
-  box(CXF - 4, by(22), 4, 12, 'N'); box(CXF + 1, by(22), 4, 12, 'N'); box(CXF - 6, by(20), 13, 3, 'N'); box(CXF - 5, by(34), 5, 2, 'N'); box(CXF + 1, by(34), 5, 2, 'N');
-  line(CXF - 6, by(10), HAND_L[0] + 1, HAND_L[1], 'N', 3); line(CXF + 6, by(10), HAND_R[0] - 1, HAND_R[1], 'N', 3);                       // raised arms
-  /* rim light on the left/top edges of the dark body */
-  const snap = grid.map((r) => r.slice());
-  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (snap[y][x] === 'N' && (x === 0 || snap[y][x - 1] === '.' || y === 0 || snap[y - 1][x] === '.')) grid[y][x] = 'R';
-
-  /* the two cleavers, then fists over the grips */
+  /* chain between the pommels, behind the sprite */
+  for (let i = 0; i <= 24; i++) { const t = i / 24; const x = ORG_L[0] + (ORG_R[0] - ORG_L[0]) * t, y = ORG_L[1] + 1 + 7 * Math.sin(Math.PI * t); if (i % 2 === 0) { put(x, y, i % 4 === 0 ? 'c' : 'C'); put(x + 1, y, i % 4 === 0 ? 'c' : 'C'); } }
+  /* the sprite */
+  SPR.rows.forEach((row, y) => [...row].forEach((ch, x) => { if (ch !== '.') grid[y + MY][x + MX] = ch; }));
+  /* the two small cleavers, held at the cuffs */
   stamp(SWORD.L, ORG_L[0], ORG_L[1], -SANG); stamp(SWORD.R, ORG_R[0], ORG_R[1], SANG);
-  box(HAND_L[0] - 2, HAND_L[1] - 2, 5, 5, 'N'); box(HAND_R[0] - 2, HAND_R[1] - 2, 5, 5, 'N');
-  box(HAND_L[0] - 2, HAND_L[1] - 2, 5, 1, 'R'); box(HAND_R[0] - 2, HAND_R[1] - 2, 5, 1, 'R');
 
-  const SCALE = 1, TX = CX - Math.round((GW * SCALE) / 2), TY = APEX + 2 - (B0 + 36) * SCALE;
+  const SCALE = 2, TX = CX - Math.round((GW * SCALE) / 2), TY = APEX + 2 - GH * SCALE;
   const sp = [];
   for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
     const ch = grid[y][x]; if (ch === '.' || !SPAL[ch]) continue;

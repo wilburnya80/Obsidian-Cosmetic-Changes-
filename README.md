@@ -1,6 +1,6 @@
 # Tengen Pixel — pixel-art Obsidian theme + Claude-ready vault kit
 
-**Pixel-art Tengen Uzui as a dark silhouette on a Yoshiwara rooftop, dual-wielding his two chained black-and-orange cleavers, with 84 distinct pixel fireworks looping continuously in a navy-to-electric-blue-and-violet night sky.**
+**Chibi pixel-art Tengen Uzui (traced from your reference sprite) on a Yoshiwara rooftop, dual-wielding two small chained black-and-orange cleavers, with 84 distinct pixel fireworks looping continuously in a navy-to-electric-blue-and-violet night sky.**
 Built with the same technique as the pixel theme in `dnd-game-brain` (pixel SVG scene behind translucent panes, Pixelify Sans headings, hard 3px borders, block shadows).
 Every note belongs to a **colour-coded category**, and a built-in toolkit lets **Claude Code in the terminal** keep the vault ultra-densely cross-linked.
 
@@ -87,7 +87,7 @@ Anything that edits existing notes is a **dry run unless you pass `--write`**.
 
 ## Tweaking the look
 
-* Scene: `src/pixel-scene.js` (sky palette, smoke, sparkles, roof; fireworks = `FW_COUNT` bursts built from 12 shapes × 8 palettes, each with its own position, size, rotation, duration and phase — raise `FW_COUNT` for more, or edit `FW_PALS`/`shapePoints()` for new looks) — it also draws Tengen and the cleavers (`makeSword()`: blade, orange edge, hole, kanji, guard, grip, pommel; `SANG` sets the raise angle). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
+* Scene: `src/pixel-scene.js` (sky palette, smoke, sparkles, roof; fireworks = `FW_COUNT` bursts built from 12 shapes × 8 palettes, each with its own position, size, rotation, duration and phase — raise `FW_COUNT` for more, or edit `FW_PALS`/`shapePoints()` for new looks) — it also draws the cleavers (`makeSword()`: `BLADE`/`GRIP` set their size, `SANG` the angle) and places them on the chibi in `src/tengen-sprite.json` (your traced image — swap its rows to change him; `SCALE` sets his size). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
 * Snippets (Settings → Appearance → CSS snippets): `no-scene` hides the animation, `bright-scene` makes panes see-through, `readable-mode` makes them nearly opaque.
 * After editing run `node tools/vault.js build`, then `node tools/vault.js install starter-vault` to sync the sample vault.
 
