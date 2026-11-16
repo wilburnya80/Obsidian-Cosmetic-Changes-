@@ -5,6 +5,8 @@ This repo is an **Obsidian theme + Claude-ready vault kit** (Demon Slayer / Teng
 ## Layout
 * `categories.json` — source of truth for categories/colours. Edit here, never hard-code category colours in CSS.
 * `src/*.css` + `src/pixel-scene.js` — theme sources. `35-categories.css` and the `{{SCENE_RULE}}` token are filled by the build. The scene is generated pixel-art SVG (see dnd-game-brain/_builder/pixelart.ps1 for the original technique).
+* `src/characters.json` — the nine character themes (palette, sky, fireworks, effect, blade). Drives `body.tg-char-<id>` CSS, per-character scenes and the Style Settings dropdown. `tools/chibi.js` generates the Hashira chibis (Tengen = traced sprite; others share his body).
+* `plugins/` — bundled Obsidian plugins: `dataview` and `obsidian-style-settings` (the theme switcher UI).
 * `plugins/dataview/` — bundled Obsidian plugin (from dnd-game-brain), installed by `install`.
 * `tools/vault.js` — the whole toolkit (Node, no dependencies). Mode is auto-detected: repo checkout vs. installed `.tengen/`.
 * `theme.css`, `manifest.json` — GENERATED. Never hand-edit.

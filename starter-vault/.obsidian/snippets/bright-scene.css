@@ -1,2 +1,2 @@
-/* Bright scene: panes become very see-through so Tengen and the fireworks dominate. */
-body.theme-dark, body.theme-light { --tg-pane: rgba(8, 5, 38, 0.40); --tg-side: rgba(6, 3, 28, 0.60); }
+/* Bright scene: panes become very see-through so the character and fireworks dominate. */
+body.theme-dark, body.theme-light { --tg-pane: rgba(var(--tg-bg-rgb), 0.40); --tg-side: rgba(var(--tg-bg2-rgb), 0.60); }

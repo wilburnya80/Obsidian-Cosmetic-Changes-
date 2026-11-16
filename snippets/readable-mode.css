@@ -1,2 +1,2 @@
 /* Readable mode: nearly opaque panes for long writing sessions. */
-body.theme-dark, body.theme-light { --tg-pane: rgba(8, 5, 38, 0.95); --tg-side: rgba(6, 3, 28, 0.96); }
+body.theme-dark, body.theme-light { --tg-pane: rgba(var(--tg-bg-rgb), 0.95); --tg-side: rgba(var(--tg-bg2-rgb), 0.96); }

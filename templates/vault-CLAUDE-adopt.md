@@ -48,6 +48,10 @@ To *open* the page panels: Command palette → "Graph view: Open local graph", "
 
 Note: the local graph keeps its own settings per pane in Obsidian. If its nodes are not coloured, open the local graph → gear icon → Groups, and add one group per folder using the query `path:"<Folder>"` (same colours as above).
 
+## Character themes
+
+Nine themes (Tengen, Giyu, Shinobu, Rengoku, Muichiro, Mitsuri, Obanai, Gyomei, Sanemi), each from a Hashira's Breathing colours. They are chosen in Settings → Style Settings → Tengen Pixel → Character theme (needs the Style Settings plugin; installed only if the owner used `--with-style-settings`). Palettes live in `.tengen/src/characters.json`; after editing run `node .tengen/tools/vault.js build`.
+
 ## Changing the look (theme)
 
 * Generated theme: `.obsidian/themes/{{THEME}}/theme.css` — never hand-edit. Sources: `.tengen/src/*.css` and the scene generator `.tengen/src/pixel-scene.js`; run `node .tengen/tools/vault.js build` after editing and tell the owner to reload.

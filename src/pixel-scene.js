@@ -4,7 +4,12 @@
    Tengen is built from code-drawn sprite pixels, auto-outlined, standing on a roof peak,
    both chained cleavers raised, pixel fireworks bursting behind him. */
 
+const fs = require('fs'), path = require('path');
+const CHARS = JSON.parse(fs.readFileSync(path.join(__dirname, 'characters.json'), 'utf8'));
 const SW = 480, SH = 270;
+const mixc = (a, b, t) => { const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16)), pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16)); return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+
+function buildOne(CH) {
 const out = [];
 const rect = (x, y, w, h, fill, extra = '') => `<rect x='${x}' y='${y}' width='${w}' height='${h}' fill='${fill}' ${extra}/>`;
 let seed = 11;
@@ -12,10 +17,10 @@ const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
 const ri = (a, b) => a + Math.floor(rnd() * (b - a));
 
 /* ---------------- sky: near-black navy -> electric blue -> violet -> magenta (from the fireworks reference) ---------------- */
-const sky = ['#02010a', '#04021a', '#060330', '#090546', '#0c0766', '#10088a', '#1a0eb0', '#2414d0', '#2c22e8', '#3a2ae8', '#5230e0', '#6a32dc', '#7e34d8', '#8c36d0', '#7a2fc0', '#5a2a9a'];
+const sky = CH.sky;
 const band = 17;
 sky.forEach((c, i) => out.push(rect(0, i * band, SW, band + 1, c)));
-out.push(rect(0, sky.length * band, SW, 200, '#5a2a9a'));
+out.push(rect(0, sky.length * band, SW, 200, sky[sky.length - 1]));
 for (let i = 1; i < sky.length; i++) for (let x = 0; x < SW; x += 4) if (rnd() < 0.5) out.push(rect(x + (i % 2) * 2, i * band - 2, 2, 2, sky[i]));
 for (let s = 0; s < 40; s++) {
   const d = (1.5 + rnd() * 3).toFixed(1), b = (rnd() * 3).toFixed(1);
@@ -51,10 +56,7 @@ function shapePoints(type) {
   return [...pts.values()];
 }
 const FW_NAMES = ['peony', 'chrysanthemum', 'willow', 'palm', 'triple-ring', 'spiral', 'star', 'crossette', 'sparkle-disc', 'flower', 'two-tone', 'heart'];
-const FW_PALS = [
-  ['#fff0b0', '#ffb43c', '#ff5a2a'], ['#ffd0e0', '#ff4f8a', '#d8206a'], ['#ffe9a8', '#ff8a3d', '#e0302a'], ['#ffd6ff', '#ff6fe0', '#a62be0'],
-  ['#e8f6ff', '#6fd0ff', '#2f6bff'], ['#f4ffd0', '#9bf06a', '#1fb27c'], ['#fff4c0', '#ffd24a', '#ff8a1f'], ['#ffffff', '#c9b8ff', '#7a4bff'],
-];
+const FW_PALS = CH.fw;
 const FW_NEEDS_DROP = new Set([2, 8]);
 out.push(`<defs>${FW_NAMES.map((n, t) => {
   const by = [[], [], []];
@@ -87,7 +89,7 @@ out.push('<!--/A-->');
 
 /* white-pink flash at the right edge (reference 1) */
 const disc = (cx, cy, r, col, op) => { let o = ''; for (let dy = -r; dy <= r; dy += 2) { const hw = Math.round(Math.sqrt(r * r - dy * dy) / 2) * 2; o += rect(cx - hw, cy + dy, hw * 2, 2, col, `opacity='${op}'`); } return o; };
-out.push(`<g>${disc(468, 100, 22, '#ff7ad0', 0.3)}${disc(468, 100, 15, '#ffc0ee', 0.55)}${disc(468, 100, 8, '#ffffff', 1)}<animate attributeName='opacity' values='1;.55;1;.8;1' dur='2.4s' repeatCount='indefinite'/></g>`);
+out.push(`<g>${disc(468, 100, 22, CH.flash[0], 0.3)}${disc(468, 100, 15, CH.flash[1], 0.55)}${disc(468, 100, 8, CH.flash[2], 1)}<animate attributeName='opacity' values='1;.55;1;.8;1' dur='2.4s' repeatCount='indefinite'/></g>`);
 
 /* pink smoke puffs drifting */
 function puff(x, y, w, h, col, op, dur, dx) {
@@ -95,17 +97,17 @@ function puff(x, y, w, h, col, op, dur, dx) {
   for (let j = 0; j < h; j += 2) for (let i = 0; i < w; i += 2) { const nx = (i - w / 2) / (w / 2), ny = (j - h / 2) / (h / 2); if (nx * nx + ny * ny < 1 - rnd() * 0.25) cells.push(`M${i} ${j}h2v2h-2z`); }
   return `<g opacity='${op}' transform='translate(${x} ${y})'><path d='${cells.join('')}' fill='${col}'/><animateTransform attributeName='transform' type='translate' values='${x} ${y}; ${x + dx} ${y - 6}; ${x} ${y}' dur='${dur}s' repeatCount='indefinite'/></g>`;
 }
-out.push(puff(262, 108, 22, 14, '#ff7ad0', 0.7, 14, 10), puff(214, 140, 28, 16, '#e35ad8', 0.6, 18, -8), puff(14, 190, 26, 14, '#ff7ad0', 0.55, 16, 8), puff(350, 175, 20, 10, '#ff7ad0', 0.5, 12, -6), puff(100, 40, 18, 10, '#c040e0', 0.5, 15, 6));
+out.push(puff(262, 108, 22, 14, CH.smoke[0], 0.7, 14, 10), puff(214, 140, 28, 16, CH.smoke[1], 0.6, 18, -8), puff(14, 190, 26, 14, CH.smoke[0], 0.55, 16, 8), puff(350, 175, 20, 10, CH.smoke[0], 0.5, 12, -6), puff(100, 40, 18, 10, CH.smoke[2], 0.5, 15, 6));
 
 /* blue fairy-light sparkles scattered over the lower sky (twinkling in three phases) */
 for (let g = 0; g < 3; g++) {
-  const cols = ['#4aa8ff', '#7fe8ff', '#ffffff', '#3a5cff'], by = cols.map(() => []);
+  const cols = CH.sparkle, by = cols.map(() => []);
   for (let k = 0; k < 110; k++) { const y = 60 + Math.pow(rnd(), 0.8) * 200; by[ri(0, 4)].push(`M${ri(0, SW)} ${Math.round(y)}h${rnd() < 0.3 ? 2 : 1}v${rnd() < 0.3 ? 2 : 1}h-2z`); }
   out.push(`<g>${cols.map((c, i) => `<path d='${by[i].join('')}' fill='${c}'/>`).join('')}<animate attributeName='opacity' values='1;.25;1' dur='${(1.4 + g * 0.9).toFixed(1)}s' begin='${(g * 0.5).toFixed(1)}s' repeatCount='indefinite'/></g>`);
 }
 /* rising sparks */
 out.push('<!--A-->');
-for (let k = 0; k < 16; k++) { const x = ri(0, SW), d = (4 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='2' fill='${['#ffd27a', '#7fe8ff', '#ff8ad8'][k % 3]}'><animateTransform attributeName='transform' type='translate' values='${x} 262; ${x + ri(-14, 14)} 110' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
+for (let k = 0; k < 16; k++) { const x = ri(0, SW), d = (4 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='2' fill='${[CH.sparkle[0], CH.a1, CH.a2][k % 3]}'><animateTransform attributeName='transform' type='translate' values='${x} 262; ${x + ri(-14, 14)} 110' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
 out.push('<!--/A-->');
 
 /* ---------------- the roof peak: dark navy with a bright blue edge ---------------- */
@@ -113,17 +115,17 @@ const CX = 352, APEX = 206;
 for (let y = APEX; y < SH; y++) {
   const hw = Math.round((y - APEX) * 1.7) + 6;
   const row = Math.floor((y - APEX) / 6);
-  out.push(rect(CX - hw, y, hw * 2, 1, row % 2 ? '#0a0830' : '#100c42'));
-  out.push(rect(CX - hw, y, 3, 1, '#7a8cff') + rect(CX + hw - 3, y, 3, 1, '#7a8cff'));
-  if ((y - APEX) % 6 === 0) for (let x = CX - hw + 6; x < CX + hw - 6; x += 8) out.push(rect(x + (row % 2) * 4, y, 2, 1, '#1e1a6a'));
+  out.push(rect(CX - hw, y, hw * 2, 1, row % 2 ? CH.roof[0] : CH.roof[1]));
+  out.push(rect(CX - hw, y, 3, 1, CH.roof[2]) + rect(CX + hw - 3, y, 3, 1, CH.roof[2]));
+  if ((y - APEX) % 6 === 0) for (let x = CX - hw + 6; x < CX + hw - 6; x += 8) out.push(rect(x + (row % 2) * 4, y, 2, 1, mixc(CH.roof[1], CH.roof[2], 0.25)));
 }
-out.push(rect(CX - 10, APEX - 2, 20, 4, '#9fb4ff') + rect(CX - 12, APEX - 4, 4, 4, '#9fb4ff') + rect(CX + 8, APEX - 4, 4, 4, '#9fb4ff'));
-out.push(rect(CX - 10, APEX + 2, 20, 2, '#4a56d8'));
+out.push(rect(CX - 10, APEX - 2, 20, 4, CH.roof[3]) + rect(CX - 12, APEX - 4, 4, 4, CH.roof[3]) + rect(CX + 8, APEX - 4, 4, 4, CH.roof[3]));
+out.push(rect(CX - 10, APEX + 2, 20, 2, mixc(CH.roof[2], '#000000', 0.35)));
 /* foreground rooftops, left + right edges */
-[[0, 238, 130], [350, 252, 130]].forEach(([x, y, w]) => { out.push(rect(x, y, w, 40, '#05041a') + rect(x, y, w, 3, '#3a3ad0')); for (let k = x; k < x + w; k += 6) out.push(rect(k, y + 3, 2, 3, '#14127a')); });
+[[0, 238, 130], [350, 252, 130]].forEach(([x, y, w]) => { out.push(rect(x, y, w, 40, CH.ink) + rect(x, y, w, 3, mixc(CH.roof[2], '#000000', 0.2))); for (let k = x; k < x + w; k += 6) out.push(rect(k, y + 3, 2, 3, mixc(CH.ink, CH.roof[2], 0.3))); });
 
-/* ---------------- TENGEN: the user's chibi sprite (src/tengen-sprite.json) dual-wielding small versions of his chained cleavers ---------------- */
-{
+/* ---------------- FIGURE: Tengen = the user's traced chibi + small chained cleavers; the other Hashira = shared chibi family + their own blade ---------------- */
+if (CH.id === 'tengen') {
   const SPR = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'tengen-sprite.json'), 'utf8'));
   const MX = 14, MY = 4;
   const GW = SPR.rows[0].length + MX * 2, GH = SPR.rows.length + MY;
@@ -181,15 +183,75 @@ out.push(rect(CX - 10, APEX + 2, 20, 2, '#4a56d8'));
   const glint = (gx, gy, b) => `<g opacity='0'>${rect(gx - 1, gy - 3, 2, 6, '#ffffff')}${rect(gx - 3, gy - 1, 6, 2, '#ffffff')}<animate attributeName='opacity' values='0;1;0;0' keyTimes='0;.08;.16;1' dur='3.2s' begin='${b}s' repeatCount='indefinite'/></g>`;
   out.push(`<g>${sp.join('')}<animateTransform attributeName='transform' type='translate' values='0 0;0 -1;0 0' dur='1.6s' repeatCount='indefinite'/></g>`);
   [tipOf(ORG_L[0], ORG_L[1], -SANG), tipOf(ORG_R[0], ORG_R[1], SANG)].forEach(([tx, ty], i) => out.push(glint(TX + tx * SCALE, TY + ty * SCALE, 0.4 + i * 1.2)));
+} else {
+  const chibi = require('../tools/chibi.js');
+  const g = chibi.gridFor(CH.id);                                   // 31 x 47 colour grid (same body as Tengen's sprite)
+  const MX = 12, MY = 16, GW = 31 + MX * 2, GH = 47 + MY;
+  const grid = Array.from({ length: GH }, () => Array(GW).fill(null));
+  g.forEach((row, y) => row.forEach((c, x) => { if (c) grid[y + MY][x + MX] = c; }));
+  const S = CH.sword, KW = 7, KH = 36, KC = 3;
+  const L = Array.from({ length: KH }, () => Array(KW).fill(null));
+  for (let y = 0; y < 26; y++) {                                      // straight katana: tapered tip, bright edge, body, dark spine
+    if (y < 3) { L[y][KC] = S.edge; if (y > 0) L[y][KC + 1] = S.blade; continue; }
+    L[y][KC - 1] = S.edge; L[y][KC] = S.blade; L[y][KC + 1] = mixc(S.blade, '#000000', 0.45);
+  }
+  for (let i = -2; i <= 2; i++) L[26][KC + i] = i === 0 ? '#ffd24a' : S.guard;       // guard
+  for (let y = 27; y < 33; y++) { L[y][KC - 1] = y % 2 ? '#1a1426' : '#f2f2f2'; L[y][KC] = y % 2 ? '#f2f2f2' : '#1a1426'; }   // wrapped grip
+  L[33][KC - 1] = '#ffd24a'; L[33][KC] = '#ffd24a'; L[34][KC - 1] = '#a8841a'; L[34][KC] = '#a8841a';
+  const mask = Array.from({ length: GH }, () => Array(GW).fill(false));
+  const ORG = [24 + MX + 1, 38 + MY + 5], DEG = 36, t = (DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
+  for (let Y = 0; Y < GH; Y++) for (let X = 0; X < GW; X++) {
+    const a = X - ORG[0], b = Y - ORG[1];
+    const lx = Math.round(a * cs + b * sn + KC), ly = Math.round(-a * sn + b * cs + KH - 1);
+    if (lx >= 0 && lx < KW && ly >= 0 && ly < KH && L[ly][lx]) { grid[Y][X] = L[ly][lx]; mask[Y][X] = true; }
+  }
+  const snapG = grid.map((r) => r.slice());
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) if (!snapG[y][x] && [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].some(([a, b]) => a >= 0 && b >= 0 && a < GW && b < GH && mask[b][a])) grid[y][x] = '#120a24';
+  const TX = CX - Math.round(GW / 2), TY = APEX + 2 - GH, sp = [];
+  for (let y = 0; y < GH; y++) for (let x = 0; x < GW; x++) {
+    const c = grid[y][x]; if (!c) continue;
+    let run = 1; while (x + run < GW && grid[y][x + run] === c) run++;
+    sp.push(rect(TX + x, TY + y, run, 1, c)); x += run - 1;
+  }
+  out.push(`<g>${sp.join('')}<animateTransform attributeName='transform' type='translate' values='0 0;0 -1;0 0' dur='1.6s' repeatCount='indefinite'/></g>`);
+  const tx = ORG[0] + (KH - 1) * Math.sin(t), ty = ORG[1] - (KH - 1) * Math.cos(t);
+  out.push(`<g opacity='0'>${rect(TX + tx - 1, TY + ty - 3, 2, 6, '#ffffff')}${rect(TX + tx - 3, TY + ty - 1, 6, 2, '#ffffff')}<animate attributeName='opacity' values='0;1;0;0' keyTimes='0;.08;.16;1' dur='3.2s' begin='0.6s' repeatCount='indefinite'/></g>`);
 }
 
 /* a few drifting embers */
 out.push('<!--A-->');
-for (let k = 0; k < 14; k++) { const x = ri(0, SW), d = (5 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='1' fill='#ffb347'><animateTransform attributeName='transform' type='translate' values='${x} 260; ${x + ri(-14, 14)} 120' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
+for (let k = 0; k < 14; k++) { const x = ri(0, SW), d = (5 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='1' fill='${CH.a1}'><animateTransform attributeName='transform' type='translate' values='${x} 260; ${x + ri(-14, 14)} 120' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
+out.push('<!--/A-->');
+
+/* ---------------- character effect ---------------- */
+out.push('<!--A-->');
+{
+  const mv = (x0, y0, x1, y1, dur, begin, inner) => `<g>${inner}<animateTransform attributeName='transform' type='translate' values='${x0} ${y0}; ${x1} ${y1}' dur='${dur}s' begin='${begin}s' repeatCount='indefinite'/></g>`;
+  const mvp = (pts, dur, begin, inner) => `<g>${inner}<animateTransform attributeName='transform' type='translate' values='${pts.map((p) => p.join(' ')).join('; ')}' dur='${dur}s' begin='${begin}s' repeatCount='indefinite'/></g>`;
+  const P = [CH.a1, CH.a2, CH.sparkle[0], CH.sparkle[2]];
+  const EX = CH.extra;
+  if (EX === 'droplets') for (let k = 0; k < 34; k++) out.push(mv(ri(0, SW), -8, ri(0, SW), 262, (4 + rnd() * 5).toFixed(1), (-rnd() * 9).toFixed(1), rect(0, 0, 1, 2, P[k % 4]) + rect(0, 2, 1, 1, '#ffffff', "opacity='.6'")));
+  if (EX === 'butterflies') for (let k = 0; k < 10; k++) { const y = ri(30, 190), c = P[k % 2]; out.push(mvp([[-12, y], [110, y - 16], [230, y + 10], [350, y - 14], [492, y + 4]], (22 + rnd() * 18).toFixed(0), (-rnd() * 30).toFixed(1), rect(-3, -1, 3, 3, c) + rect(1, -1, 3, 3, c) + rect(0, 0, 1, 3, '#ffffff') + `<animate attributeName='opacity' values='1;.55;1' dur='0.6s' repeatCount='indefinite'/>`)); }
+  if (EX === 'embers') for (let k = 0; k < 46; k++) out.push(mvp([[ri(0, SW), 262], [ri(0, SW), 170], [ri(0, SW), 60]], (4 + rnd() * 5).toFixed(1), (-rnd() * 9).toFixed(1), rect(0, 0, rnd() < 0.3 ? 2 : 1, rnd() < 0.3 ? 2 : 1, P[k % 3]) + `<animate attributeName='opacity' values='0;1;.8;0' dur='${(4 + rnd() * 3).toFixed(1)}s' repeatCount='indefinite'/>`));
+  if (EX === 'fog') for (let k = 0; k < 7; k++) { const y = ri(110, 235), w = ri(60, 120); let cells = ''; for (let j = 0; j < 14; j += 2) for (let i = 0; i < w; i += 4) { const nx = (i - w / 2) / (w / 2), ny = (j - 7) / 7; if (nx * nx + ny * ny < 1 - rnd() * 0.25) cells += `M${i} ${j}h4v2h-4z`; } out.push(mv(-w - 10, y, SW + 10, y + ri(-6, 6), (55 + rnd() * 40).toFixed(0), (-rnd() * 80).toFixed(0), `<path d='${cells}' fill='${CH.smoke[0]}' opacity='${(0.14 + rnd() * 0.1).toFixed(2)}'/>`)); }
+  if (EX === 'hearts') { const H = ['.x.x.', 'xxxxx', '.xxx.', '..x..']; for (let k = 0; k < 16; k++) { const x = ri(10, 470), c = k % 3 === 0 ? '#ffffff' : P[k % 2]; let cells = ''; H.forEach((r, j) => [...r].forEach((ch, i) => { if (ch === 'x') cells += `M${i} ${j}h1v1h-1z`; })); out.push(mvp([[x, 266], [x + 10, 190], [x - 8, 110], [x + 6, 20]], (11 + rnd() * 9).toFixed(0), (-rnd() * 18).toFixed(1), `<path d='${cells}' fill='${c}'/>`)); } }
+  if (EX === 'snake') for (let k = 0; k < 2; k++) { let cells = ''; for (let i = 0; i < 44; i++) cells += `<rect x='${i * 3}' y='${Math.round(4 * Math.sin(i * 0.65))}' width='3' height='3' fill='${i % 6 < 3 ? CH.a1 : CH.a2}'/>`; cells += rect(44 * 3, Math.round(4 * Math.sin(44 * 0.65)) - 1, 4, 4, CH.a2) + rect(44 * 3 + 2, Math.round(4 * Math.sin(44 * 0.65)), 1, 1, '#ff2d2d'); out.push(mv(-150, 120 + k * 70, SW + 40, 100 + k * 70, 34 + k * 8, -k * 14, cells)); }
+  if (EX === 'pebbles') for (let k = 0; k < 24; k++) out.push(mvp([[ri(0, SW), 262], [ri(0, SW), 190], [ri(0, SW), 90]], (13 + rnd() * 11).toFixed(0), (-rnd() * 24).toFixed(1), rect(0, 0, 2, 2, P[k % 3]) + `<animate attributeName='opacity' values='0;.9;.9;0' dur='${(13 + rnd() * 6).toFixed(0)}s' repeatCount='indefinite'/>`));
+  if (EX === 'wind') for (let k = 0; k < 20; k++) { const y = ri(14, 230), L = ri(8, 22); out.push(mv(-30, y, SW + 30, y + ri(-14, 14), (2.5 + rnd() * 3.5).toFixed(1), (-rnd() * 6).toFixed(1), rect(0, 0, L, 1, P[k % 4]) + rect(L - 3, 1, 3, 1, P[(k + 1) % 4], "opacity='.7'"))); }
+}
 out.push('<!--/A-->');
 
 const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${SW}' height='${SH}' viewBox='0 0 ${SW} ${SH}' preserveAspectRatio='xMaxYMax slice' shape-rendering='crispEdges'>${out.join('')}</svg>`;
 /* animated=false -> a still scene: no fireworks, rising sparks or embers, and every SMIL animation removed (smoke, stars, sparkles, Tengen frozen). */
 const stillSvg = svg.replace(/<!--A-->[\s\S]*?<!--\/A-->/g, '').replace(/<animate(Transform)?\b[^>]*?(\/>|>[\s\S]*?<\/animate(Transform)?>)/g, '');
-module.exports = { buildSceneSvg: (animated = true) => (animated ? svg : stillSvg), fireworkCount: FW_COUNT };
-if (require.main === module) { require('fs').writeFileSync(process.argv[2] || 'scene.svg', svg); console.log('scene.svg', svg.length, 'bytes'); }
+return { svg, stillSvg, count: FW_COUNT };
+}
+
+const CACHE = {};
+function get(id) {
+  id = id || CHARS.default;
+  if (!CACHE[id]) CACHE[id] = buildOne(CHARS.characters.find((c) => c.id === id) || CHARS.characters[0]);
+  return CACHE[id];
+}
+module.exports = { buildSceneSvg: (animated = true, id) => (animated ? get(id).svg : get(id).stillSvg), fireworkCount: 84, characters: CHARS.characters, defaultCharacter: CHARS.default };
+if (require.main === module) { const id = process.argv[3] || 'tengen'; fs.writeFileSync(process.argv[2] || 'scene.svg', get(id).svg); console.log('scene', id, get(id).svg.length, 'bytes'); }

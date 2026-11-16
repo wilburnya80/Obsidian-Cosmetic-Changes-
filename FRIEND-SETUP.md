@@ -23,6 +23,7 @@ Unzip this kit anywhere.
 | Option | What it does |
 |---|---|
 | `--with-dataview` | also installs the Dataview plugin and turns it on (Obsidian asks once to enable community plugins). Skipped if you already have it. Default: not installed |
+| `--with-style-settings` | also installs the Style Settings plugin, which gives you the **Character theme dropdown** (section 3b). Default: not installed |
 | `--with-hotkeys` | adds hotkeys for the right-side panels (see section 4). Never overwrites a hotkey you already use. Default: none added |
 | `--no-claude-md` | do not create or edit `CLAUDE.md` in your vault (see section 6). Default: it is created, or appended to your existing one |
 | `--reset-categories` | re-scan your folders and redo the folder colours (use after adding folders; this discards colours you edited by hand) |
@@ -61,6 +62,11 @@ Press **Ctrl/Cmd+R** to reload. Settings → Appearance → Themes → **Tengen 
 | `bright-scene` | panes become very see-through so the scene dominates |
 | `readable-mode` | panes become nearly solid for long writing sessions |
 | `no-scene` | removes the picture entirely (plain pixel UI), good for slow computers |
+
+## 3b. Character themes (the switcher)
+Nine colour themes, one per Hashira, built from their Breathing / blade colours: Tengen (Sound, violet-blue and orange), Giyu (Water, ocean blue), Shinobu (Insect, purple), Rengoku (Flame, orange-red), Muichiro (Mist, pale teal), Mitsuri (Love, pink and green), Obanai (Serpent, dark green and yellow), Gyomei (Stone, earth brown), Sanemi (Wind, green and white). Each recolours the whole interface, the sky, the fireworks, adds its own effect (droplets, butterflies, embers, fog, hearts, a snake, pebbles, wind streaks) and puts that Hashira's chibi on the roof.
+
+**To switch:** install with `--with-style-settings` (or install the free "Style Settings" community plugin yourself), turn on community plugins when Obsidian asks, then Settings → Style Settings → **Tengen Pixel** → **Character theme** → pick a Hashira. Without the plugin you get the default Tengen theme. Your folder colours, links and graph groups do not change between themes.
 
 ## 4. Right-side panels for the page you're on
 **Open them:** Command palette (Ctrl/Cmd+P) → "Graph view: Open local graph", "Backlinks: Open backlinks for the current note", "Outgoing links: Open outgoing links…", "Outline: Open outline", "Toggle right sidebar". **Hide them** with the `hide-…` switches above.
@@ -112,7 +118,7 @@ Open a terminal in your vault folder and run `claude`. `CLAUDE.md` tells it the 
 
 ## Quick reference
 ```
-install:   ./install.sh "VAULT" [--with-dataview] [--with-hotkeys] [--no-claude-md] [--reset-categories]
+install:   ./install.sh "VAULT" [--with-dataview] [--with-style-settings] [--with-hotkeys] [--no-claude-md] [--reset-categories]
 tools:     node .tengen/tools/vault.js  autolink [--write] [--mode first]
                                         check [--strict]
                                         colors | build | restore [--write]

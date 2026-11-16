@@ -1,3 +1,5 @@
+{{STYLE_SETTINGS}}
+
 /* ==========================================================================
    TENGEN PIXEL — Entertainment District pixel-art Obsidian theme
    Same technique as the DND vault's dnd-pixel theme: a pixel-art SVG scene behind
@@ -23,7 +25,10 @@ body.theme-dark, body.theme-light {
   --text-selection: rgba(255, 79, 160, 0.4);
   --graph-line: rgba(200, 170, 255, 0.22); --graph-node: #b78bff; --graph-node-unresolved: #3d2fae; --graph-node-focused: #ffb347; --graph-node-tag: #ffb347;
   --scrollbar-bg: transparent; --scrollbar-thumb-bg: #3d2fae; --scrollbar-active-thumb-bg: #ff4fa0;
-  --tg-pane: rgba(8, 5, 38, 0.78); --tg-side: rgba(6, 3, 28, 0.84); --tg-graph: rgba(5, 3, 24, 0.30);
+  --tg-a1: #ffb347; --tg-a1-rgb: 255, 179, 71; --tg-a2: #ff4fa0; --tg-a2-rgb: 255, 79, 160;
+  --tg-bd: #3d2fae; --tg-bd-rgb: 61, 47, 174; --tg-bd2: #7a6aff; --tg-btn: #8a2be2;
+  --tg-bg-rgb: 8, 5, 38; --tg-bg2-rgb: 6, 3, 28; --tg-ink-rgb: 4, 2, 22;
+  --tg-pane: rgba(var(--tg-bg-rgb), 0.78); --tg-side: rgba(var(--tg-bg2-rgb), 0.84); --tg-graph: rgba(var(--tg-ink-rgb), 0.30);
   --tg-pixel: 'Pixelify Sans', var(--font-interface-theme), monospace;
   --font-ui-smaller: 13px; --font-ui-small: 14px; --font-ui-medium: 16px; --font-ui-large: 21px;
   --radius-s: 0px; --radius-m: 0px; --radius-l: 0px; --checkbox-radius: 0px;

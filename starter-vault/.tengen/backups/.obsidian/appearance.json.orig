@@ -1,8 +1,0 @@
-{
-  "theme": "obsidian",
-  "cssTheme": "Tengen Pixel",
-  "enabledCssSnippets": [
-    "category-link-colors",
-    "live-fireworks"
-  ]
-}
