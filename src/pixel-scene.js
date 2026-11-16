@@ -25,6 +25,7 @@ for (let s = 0; s < 40; s++) {
 /* ---------------- fireworks: 84 distinct looping animations ----------------
    12 pixel shapes (defined once in <defs>) x 8 palettes, each of the 84 bursts with its own position, size, rotation,
    duration and phase, so something is always exploding and no two bursts repeat in step. Colours come from CSS vars (--c1 inner, --c2 mid, --c3 outer). */
+out.push('<!--A-->');
 const FW_COUNT = 84;
 const snap2 = (v) => Math.round(v / 2) * 2;
 function shapePoints(type) {
@@ -82,6 +83,7 @@ for (let i = 0; i < FW_COUNT; i++) {
     `<g>${drop}<use href='#fw${type}'/></g>` + rect(-3, -3, 6, 6, pal[0]) + `</g></g>`);
   fwLog.push(`${FW_NAMES[type]}@${x},${y} R${Math.round(size)} ${dur}s`);
 }
+out.push('<!--/A-->');
 
 /* white-pink flash at the right edge (reference 1) */
 const disc = (cx, cy, r, col, op) => { let o = ''; for (let dy = -r; dy <= r; dy += 2) { const hw = Math.round(Math.sqrt(r * r - dy * dy) / 2) * 2; o += rect(cx - hw, cy + dy, hw * 2, 2, col, `opacity='${op}'`); } return o; };
@@ -91,7 +93,7 @@ out.push(`<g>${disc(468, 100, 22, '#ff7ad0', 0.3)}${disc(468, 100, 15, '#ffc0ee'
 function puff(x, y, w, h, col, op, dur, dx) {
   const cells = [];
   for (let j = 0; j < h; j += 2) for (let i = 0; i < w; i += 2) { const nx = (i - w / 2) / (w / 2), ny = (j - h / 2) / (h / 2); if (nx * nx + ny * ny < 1 - rnd() * 0.25) cells.push(`M${i} ${j}h2v2h-2z`); }
-  return `<g opacity='${op}'><path d='${cells.join('')}' fill='${col}'/><animateTransform attributeName='transform' type='translate' values='${x} ${y}; ${x + dx} ${y - 6}; ${x} ${y}' dur='${dur}s' repeatCount='indefinite'/></g>`;
+  return `<g opacity='${op}' transform='translate(${x} ${y})'><path d='${cells.join('')}' fill='${col}'/><animateTransform attributeName='transform' type='translate' values='${x} ${y}; ${x + dx} ${y - 6}; ${x} ${y}' dur='${dur}s' repeatCount='indefinite'/></g>`;
 }
 out.push(puff(262, 108, 22, 14, '#ff7ad0', 0.7, 14, 10), puff(214, 140, 28, 16, '#e35ad8', 0.6, 18, -8), puff(14, 190, 26, 14, '#ff7ad0', 0.55, 16, 8), puff(350, 175, 20, 10, '#ff7ad0', 0.5, 12, -6), puff(100, 40, 18, 10, '#c040e0', 0.5, 15, 6));
 
@@ -102,7 +104,9 @@ for (let g = 0; g < 3; g++) {
   out.push(`<g>${cols.map((c, i) => `<path d='${by[i].join('')}' fill='${c}'/>`).join('')}<animate attributeName='opacity' values='1;.25;1' dur='${(1.4 + g * 0.9).toFixed(1)}s' begin='${(g * 0.5).toFixed(1)}s' repeatCount='indefinite'/></g>`);
 }
 /* rising sparks */
+out.push('<!--A-->');
 for (let k = 0; k < 16; k++) { const x = ri(0, SW), d = (4 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='2' fill='${['#ffd27a', '#7fe8ff', '#ff8ad8'][k % 3]}'><animateTransform attributeName='transform' type='translate' values='${x} 262; ${x + ri(-14, 14)} 110' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
+out.push('<!--/A-->');
 
 /* ---------------- the roof peak: dark navy with a bright blue edge ---------------- */
 const CX = 352, APEX = 206;
@@ -180,8 +184,12 @@ out.push(rect(CX - 10, APEX + 2, 20, 2, '#4a56d8'));
 }
 
 /* a few drifting embers */
+out.push('<!--A-->');
 for (let k = 0; k < 14; k++) { const x = ri(0, SW), d = (5 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='1' fill='#ffb347'><animateTransform attributeName='transform' type='translate' values='${x} 260; ${x + ri(-14, 14)} 120' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
+out.push('<!--/A-->');
 
 const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${SW}' height='${SH}' viewBox='0 0 ${SW} ${SH}' preserveAspectRatio='xMaxYMax slice' shape-rendering='crispEdges'>${out.join('')}</svg>`;
-module.exports = { buildSceneSvg: () => svg, fireworkCount: FW_COUNT };
+/* animated=false -> a still scene: no fireworks, rising sparks or embers, and every SMIL animation removed (smoke, stars, sparkles, Tengen frozen). */
+const stillSvg = svg.replace(/<!--A-->[\s\S]*?<!--\/A-->/g, '').replace(/<animate(Transform)?\b[^>]*?(\/>|>[\s\S]*?<\/animate(Transform)?>)/g, '');
+module.exports = { buildSceneSvg: (animated = true) => (animated ? svg : stillSvg), fireworkCount: FW_COUNT };
 if (require.main === module) { require('fs').writeFileSync(process.argv[2] || 'scene.svg', svg); console.log('scene.svg', svg.length, 'bytes'); }
