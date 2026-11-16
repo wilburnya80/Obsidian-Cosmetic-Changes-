@@ -1,12 +1,12 @@
 # Tengen Pixel — pixel-art Obsidian theme + Claude-ready vault kit
 
-**Chibi pixel-art Tengen Uzui (traced from your reference sprite) on a Yoshiwara rooftop, both cleavers raised, animated pixel fireworks bursting over a lantern-lit night city.**
+**Chibi pixel-art Tengen Uzui (traced from your reference sprite) on a Yoshiwara rooftop, both cleavers raised, animated pixel fireworks bursting in a navy-to-electric-blue-and-violet night sky.**
 Built with the same technique as the pixel theme in `dnd-game-brain` (pixel SVG scene behind translucent panes, Pixelify Sans headings, hard 3px borders, block shadows).
 Every note belongs to a **colour-coded category**, and a built-in toolkit lets **Claude Code in the terminal** keep the vault ultra-densely cross-linked.
 
 ![pixel scene](docs/preview-pixel-tengen.png)
 
-> Preview rendered from the real `theme.css` in a mock Obsidian-style window (single frame; the scene animates: bursts, twinkling stars, flickering lanterns, drifting embers, idle bob).
+> Preview rendered from the real `theme.css` in a mock Obsidian-style window (single frame; the scene animates: radial-streak fireworks, twinkling blue sparkles, drifting pink smoke, rising sparks, idle bob).
 
 ## What's in the box
 
@@ -90,7 +90,7 @@ Anything that edits existing notes is a **dry run unless you pass `--write`**.
 
 ## Tweaking the look
 
-* Scene: `src/pixel-scene.js` (firework list, roof, skyline) and `src/tengen-sprite.json` (the chibi Tengen, traced from your reference image — swap the rows to change him). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
+* Scene: `src/pixel-scene.js` (sky palette, firework list, smoke, sparkles, roof) and `src/tengen-sprite.json` (the chibi Tengen, traced from your reference image — swap the rows to change him). Panes/typography: `src/20-chrome.css`, `src/30-typography.css`, palette in `src/10-variables.css` (`--tg-pane`, `--tg-side` control how much scene shows through).
 * Snippets (Settings → Appearance → CSS snippets): `no-scene` hides the animation, `bright-scene` makes panes see-through, `readable-mode` makes them nearly opaque.
 * After editing run `node tools/vault.js build`, then `node tools/vault.js install starter-vault` to sync the sample vault.
 

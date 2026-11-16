@@ -11,88 +11,77 @@ let seed = 11;
 const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
 const ri = (a, b) => a + Math.floor(rnd() * (b - a));
 
-/* ---------------- sky ---------------- */
-const sky = ['#0d0720', '#150b30', '#1f0f45', '#2d1259', '#44145f', '#5f1763', '#7f1b64', '#8f1d5a', '#a52358', '#b92c52', '#cc3a4c'];
-const band = 14;
+/* ---------------- sky: near-black navy -> electric blue -> violet -> magenta (from the fireworks reference) ---------------- */
+const sky = ['#02010a', '#04021a', '#060330', '#090546', '#0c0766', '#10088a', '#1a0eb0', '#2414d0', '#2c22e8', '#3a2ae8', '#5230e0', '#6a32dc', '#7e34d8', '#8c36d0', '#7a2fc0', '#5a2a9a'];
+const band = 17;
 sky.forEach((c, i) => out.push(rect(0, i * band, SW, band + 1, c)));
-out.push(rect(0, sky.length * band, SW, 200, '#cc3a4c'));
+out.push(rect(0, sky.length * band, SW, 200, '#5a2a9a'));
 for (let i = 1; i < sky.length; i++) for (let x = 0; x < SW; x += 4) if (rnd() < 0.5) out.push(rect(x + (i % 2) * 2, i * band - 2, 2, 2, sky[i]));
-for (let s = 0; s < 50; s++) {
+for (let s = 0; s < 40; s++) {
   const d = (1.5 + rnd() * 3).toFixed(1), b = (rnd() * 3).toFixed(1);
-  out.push(`<rect x='${ri(0, SW)}' y='${ri(0, 70)}' width='1' height='1' fill='#fff6d5'><animate attributeName='opacity' values='1;.2;1' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`);
+  out.push(`<rect x='${ri(0, SW)}' y='${ri(0, 90)}' width='1' height='1' fill='#e8e4ff'><animate attributeName='opacity' values='1;.2;1' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`);
 }
 
-/* crimson pixel moon */
-const moon = ['..XXXXXX..', '.XXXXXXXX.', 'XXXXXXXXXX', 'XXXXXXXXXX', 'XXXXXXXXXX', 'XXXXXXXXXX', 'XXXXXXXXXX', 'XXXXXXXXXX', '.XXXXXXXX.', '..XXXXXX..'];
-moon.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === 'X') out.push(rect(40 + c * 2, 22 + r * 2, 2, 2, (r + c) % 5 === 0 ? '#ffb3c1' : '#ffd0d8')); }));
-
-/* ---------------- fireworks (pixel bursts, stepped expansion) ---------------- */
-function burst(cx, cy, cols, begin, dur, R) {
-  const spark = [];
-  const add = (x, y, col, sz) => spark.push(rect(Math.round(x / 2) * 2 - sz / 2, Math.round(y / 2) * 2 - sz / 2, sz, sz, col));
-  for (let k = 0; k < 16; k++) { const a = (k / 16) * Math.PI * 2; add(Math.cos(a) * R, Math.sin(a) * R, cols[k % cols.length], 2); }
-  for (let k = 0; k < 16; k++) { const a = (k / 16) * Math.PI * 2 + Math.PI / 16; add(Math.cos(a) * R * 0.66, Math.sin(a) * R * 0.66, cols[(k + 1) % cols.length], 2); }
-  for (let k = 0; k < 8; k++) { const a = (k / 8) * Math.PI * 2; add(Math.cos(a) * R * 1.18, Math.sin(a) * R * 1.18, '#ffffff', 2); add(Math.cos(a) * R * 0.3, Math.sin(a) * R * 0.3, cols[0], 2); }
-  const f = 3.4 / dur;
-  const kt = (arr) => arr.map((v) => +(v * f).toFixed(4)).join(';');
+/* ---------------- fireworks: big radial-streak peonies (inner gold-white -> orange -> red/pink tips) ---------------- */
+function burst(cx, cy, pal, begin, dur, R, rays) {
+  const by = [[], [], []];
+  const addPx = (k, x, y) => by[k].push(`M${Math.round(x / 2) * 2} ${Math.round(y / 2) * 2}h2v2h-2z`);
+  for (let r = 0; r < rays; r++) {
+    const a = (r / rays) * Math.PI * 2 + (r % 2) * 0.03;
+    const len = R * (r % 3 === 0 ? 1 : r % 3 === 1 ? 0.82 : 0.66);
+    for (let t = R * 0.2; t <= len; t += 3) { const k = t < R * 0.42 ? 0 : t < R * 0.74 ? 1 : 2; addPx(k, Math.cos(a) * t, Math.sin(a) * t); }
+  }
+  const f = 3.6 / dur;
+  const T = (v) => (v * f).toFixed(4);
   return `<g transform='translate(${cx} ${cy})'><g opacity='0'>` +
-    `<animateTransform attributeName='transform' type='scale' calcMode='discrete' values='.1;.35;.6;.85;1;1.08;1.08' keyTimes='0;${(0.1 * f).toFixed(4)};${(0.22 * f).toFixed(4)};${(0.36 * f).toFixed(4)};${(0.5 * f).toFixed(4)};${(0.7 * f).toFixed(4)};${f.toFixed(4)}' dur='${dur}s' begin='${begin}s' repeatCount='indefinite'/>` +
-    `<animate attributeName='opacity' calcMode='discrete' values='1;1;.75;.5;.25;0;0' keyTimes='0;${(0.5 * f).toFixed(4)};${(0.62 * f).toFixed(4)};${(0.74 * f).toFixed(4)};${(0.86 * f).toFixed(4)};${(0.96 * f).toFixed(4)};1' dur='${dur}s' begin='${begin}s' repeatCount='indefinite'/>` +
-    spark.join('') + rect(-3, -3, 6, 6, '#fff6d5') + `</g></g>`;
+    `<animateTransform attributeName='transform' type='scale' calcMode='discrete' values='.12;.3;.5;.7;.88;1;1.06;1.06' keyTimes='0;${T(0.06)};${T(0.14)};${T(0.24)};${T(0.36)};${T(0.5)};${T(0.7)};${T(1)}' dur='${dur}s' begin='${begin}s' repeatCount='indefinite'/>` +
+    `<animate attributeName='opacity' calcMode='discrete' values='1;1;1;.8;.55;.3;.12;0;0' keyTimes='0;${T(0.3)};${T(0.5)};${T(0.62)};${T(0.74)};${T(0.84)};${T(0.92)};${T(0.98)};1' dur='${dur}s' begin='${begin}s' repeatCount='indefinite'/>` +
+    pal.map((c, k) => `<path d='${by[k].join('')}' fill='${c}'/>`).join('') + rect(-4, -4, 8, 8, '#fff8dc') + rect(-8, -2, 16, 4, '#ffe9a8', "opacity='.6'") + rect(-2, -8, 4, 16, '#ffe9a8', "opacity='.6'") + `</g></g>`;
 }
-const PAL1 = ['#ff2d55', '#ffc93c', '#ff4fd8', '#ffffff'], PAL2 = ['#8b3dff', '#3ea6ff', '#ff4fd8', '#ffffff'], PAL3 = ['#ffc93c', '#ff8a3d', '#ff2d55', '#fff1c1'];
+const GOLD = ['#fff0b0', '#ffb43c', '#ff5a2a'], PINK = ['#ffd0e0', '#ff4f8a', '#d8206a'], ORANGE = ['#ffe9a8', '#ff8a3d', '#e0302a'], MAG = ['#ffd6ff', '#ff6fe0', '#a62be0'];
 [
-  [96, 70, PAL1, -1.2, 7.0, 34], [210, 46, PAL2, -3.8, 8.5, 28], [300, 82, PAL3, -0.4, 6.5, 38], [420, 52, PAL1, -5.2, 9.0, 32],
-  [150, 110, PAL3, -2.4, 7.5, 24], [380, 112, PAL2, -6.1, 8.0, 26], [250, 24, PAL1, -4.4, 10, 22], [60, 130, PAL2, -1.9, 9.5, 22],
-].forEach((b) => out.push(burst(b[0], b[1], b[2], b[3], b[4], Math.round(b[5] * 1.5))));
+  [352, 62, PINK, -1.0, 8.0, 74, 40],     // big burst right above Tengen (reference 1)
+  [112, 118, GOLD, -3.2, 9.0, 70, 40],           // big orange-gold peony on the left (reference 2)
+  [236, 40, MAG, -5.0, 8.5, 44, 28],
+  [424, 130, ORANGE, -2.4, 7.5, 40, 28],
+  [40, 56, PINK, -6.1, 9.5, 38, 26],
+  [196, 160, PINK, -4.2, 10, 30, 22],
+].forEach((b) => out.push(burst(b[0], b[1], b[2], b[3], b[4], b[5], b[6])));
 
-/* ---------------- far skyline: stepped pagodas + glowing lanterns ---------------- */
-const DARK = '#24103f', DARKER = '#190b2e';
-function pagoda(x, base, w, tiers, col) {
-  const s = [];
-  let y = base, tw = w;
-  for (let t = 0; t < tiers; t++) {
-    s.push(rect(x + (w - tw) / 2 + 2, y - 8, tw - 4, 8, col));                 // body
-    s.push(rect(x + (w - tw) / 2 - 3, y - 10, tw + 6, 2, col));                // eave
-    s.push(rect(x + (w - tw) / 2 - 5, y - 12, 4, 2, col) + rect(x + (w - tw) / 2 + tw + 1, y - 12, 4, 2, col)); // upturned tips
-    y -= 12; tw = Math.max(8, tw - 8);
-  }
-  s.push(rect(x + w / 2 - 1, y - 8, 2, 8, col));
-  return s.join('');
-}
-[[10, 170, 40, 3], [70, 172, 32, 2], [128, 168, 44, 4], [196, 174, 30, 2], [250, 170, 38, 3], [420, 168, 42, 3], [452, 174, 28, 2]].forEach(([x, b, w, t]) => out.push(pagoda(x, b + 18, w, t, DARKER)));
-out.push(rect(0, 186, SW, 90, DARKER));
-for (let x = 0; x < SW; x += 6) if (rnd() < 0.18) out.push(rect(x, ri(176, 194), 2, 3, '#ffc27a', `><animate attributeName='opacity' values='1;.4;1' dur='${(1 + rnd() * 2).toFixed(1)}s' repeatCount='indefinite'/></rect><rect hidden='1'`));
-/* lantern strings */
-for (let row = 0; row < 2; row++) {
-  const y0 = 150 + row * 22;
-  for (let x = 6 + row * 12; x < SW; x += 24) {
-    const sag = Math.round(Math.abs(Math.sin(x / 40)) * 4);
-    out.push(rect(x, y0 + sag, 24, 1, '#3a1f4d'));
-    out.push(rect(x + 9, y0 + sag + 1, 6, 8, '#ff2d55') + rect(x + 10, y0 + sag + 2, 4, 2, '#ffc93c') + rect(x + 10, y0 + sag + 9, 4, 1, '#5a1a2a'));
-    out.push(`<rect x='${x + 7}' y='${y0 + sag - 1}' width='10' height='12' fill='#ffb347' opacity='.12'><animate attributeName='opacity' values='.08;.2;.1' dur='${(0.8 + rnd()).toFixed(1)}s' repeatCount='indefinite'/></rect>`);
-  }
-}
-/* rising paper lanterns */
-for (let k = 0; k < 7; k++) {
-  const x = ri(10, 470), d = (14 + rnd() * 10).toFixed(0), b = (-rnd() * 20).toFixed(1);
-  out.push(`<g><rect x='0' y='0' width='4' height='5' fill='#ffd27a'/><rect x='1' y='1' width='2' height='2' fill='#fff6d5'/><animateTransform attributeName='transform' type='translate' values='${x} 190; ${x + ri(-12, 12)} 10' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;1;0' keyTimes='0;.1;.8;1' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></g>`);
-}
+/* white-pink flash at the right edge (reference 1) */
+const disc = (cx, cy, r, col, op) => { let o = ''; for (let dy = -r; dy <= r; dy += 2) { const hw = Math.round(Math.sqrt(r * r - dy * dy) / 2) * 2; o += rect(cx - hw, cy + dy, hw * 2, 2, col, `opacity='${op}'`); } return o; };
+out.push(`<g>${disc(468, 100, 22, '#ff7ad0', 0.3)}${disc(468, 100, 15, '#ffc0ee', 0.55)}${disc(468, 100, 8, '#ffffff', 1)}<animate attributeName='opacity' values='1;.55;1;.8;1' dur='2.4s' repeatCount='indefinite'/></g>`);
 
-/* ---------------- the roof peak ---------------- */
-const CX = 352, APEX = 206;                 // roof apex (Tengen's feet touch it)
+/* pink smoke puffs drifting */
+function puff(x, y, w, h, col, op, dur, dx) {
+  const cells = [];
+  for (let j = 0; j < h; j += 2) for (let i = 0; i < w; i += 2) { const nx = (i - w / 2) / (w / 2), ny = (j - h / 2) / (h / 2); if (nx * nx + ny * ny < 1 - rnd() * 0.25) cells.push(`M${i} ${j}h2v2h-2z`); }
+  return `<g opacity='${op}'><path d='${cells.join('')}' fill='${col}'/><animateTransform attributeName='transform' type='translate' values='${x} ${y}; ${x + dx} ${y - 6}; ${x} ${y}' dur='${dur}s' repeatCount='indefinite'/></g>`;
+}
+out.push(puff(262, 108, 22, 14, '#ff7ad0', 0.7, 14, 10), puff(214, 140, 28, 16, '#e35ad8', 0.6, 18, -8), puff(14, 190, 26, 14, '#ff7ad0', 0.55, 16, 8), puff(350, 175, 20, 10, '#ff7ad0', 0.5, 12, -6), puff(100, 40, 18, 10, '#c040e0', 0.5, 15, 6));
+
+/* blue fairy-light sparkles scattered over the lower sky (twinkling in three phases) */
+for (let g = 0; g < 3; g++) {
+  const cols = ['#4aa8ff', '#7fe8ff', '#ffffff', '#3a5cff'], by = cols.map(() => []);
+  for (let k = 0; k < 110; k++) { const y = 60 + Math.pow(rnd(), 0.8) * 200; by[ri(0, 4)].push(`M${ri(0, SW)} ${Math.round(y)}h${rnd() < 0.3 ? 2 : 1}v${rnd() < 0.3 ? 2 : 1}h-2z`); }
+  out.push(`<g>${cols.map((c, i) => `<path d='${by[i].join('')}' fill='${c}'/>`).join('')}<animate attributeName='opacity' values='1;.25;1' dur='${(1.4 + g * 0.9).toFixed(1)}s' begin='${(g * 0.5).toFixed(1)}s' repeatCount='indefinite'/></g>`);
+}
+/* rising sparks */
+for (let k = 0; k < 16; k++) { const x = ri(0, SW), d = (4 + rnd() * 5).toFixed(1), b = (-rnd() * 8).toFixed(1); out.push(`<rect x='0' y='0' width='1' height='2' fill='${['#ffd27a', '#7fe8ff', '#ff8ad8'][k % 3]}'><animateTransform attributeName='transform' type='translate' values='${x} 262; ${x + ri(-14, 14)} 110' dur='${d}s' begin='${b}s' repeatCount='indefinite'/><animate attributeName='opacity' values='0;1;0' dur='${d}s' begin='${b}s' repeatCount='indefinite'/></rect>`); }
+
+/* ---------------- the roof peak: dark navy with a bright blue edge ---------------- */
+const CX = 352, APEX = 206;
 for (let y = APEX; y < SH; y++) {
   const hw = Math.round((y - APEX) * 1.7) + 6;
   const row = Math.floor((y - APEX) / 6);
-  out.push(rect(CX - hw, y, hw * 2, 1, row % 2 ? '#2b1a52' : '#35206a'));
-  out.push(rect(CX - hw, y, 3, 1, '#ff2d55') + rect(CX + hw - 3, y, 3, 1, '#ff2d55'));
-  if ((y - APEX) % 6 === 0) for (let x = CX - hw + 6; x < CX + hw - 6; x += 8) out.push(rect(x + (row % 2) * 4, y, 2, 1, '#4a2f8a'));
+  out.push(rect(CX - hw, y, hw * 2, 1, row % 2 ? '#0a0830' : '#100c42'));
+  out.push(rect(CX - hw, y, 3, 1, '#7a8cff') + rect(CX + hw - 3, y, 3, 1, '#7a8cff'));
+  if ((y - APEX) % 6 === 0) for (let x = CX - hw + 6; x < CX + hw - 6; x += 8) out.push(rect(x + (row % 2) * 4, y, 2, 1, '#1e1a6a'));
 }
-out.push(rect(CX - 10, APEX - 2, 20, 4, '#ffc93c') + rect(CX - 12, APEX - 4, 4, 4, '#ffc93c') + rect(CX + 8, APEX - 4, 4, 4, '#ffc93c')); // ridge cap + end ornaments
-out.push(rect(CX - 10, APEX + 2, 20, 2, '#b8860b'));
-
+out.push(rect(CX - 10, APEX - 2, 20, 4, '#9fb4ff') + rect(CX - 12, APEX - 4, 4, 4, '#9fb4ff') + rect(CX + 8, APEX - 4, 4, 4, '#9fb4ff'));
+out.push(rect(CX - 10, APEX + 2, 20, 2, '#4a56d8'));
 /* foreground rooftops, left + right edges */
-[[0, 238, 130], [350, 252, 130]].forEach(([x, y, w]) => { out.push(rect(x, y, w, 40, '#150826') + rect(x, y, w, 3, '#2d1259')); for (let k = x; k < x + w; k += 6) out.push(rect(k, y + 3, 2, 3, '#3b1d6a')); });
+[[0, 238, 130], [350, 252, 130]].forEach(([x, y, w]) => { out.push(rect(x, y, w, 40, '#05041a') + rect(x, y, w, 3, '#3a3ad0')); for (let k = x; k < x + w; k += 6) out.push(rect(k, y + 3, 2, 3, '#14127a')); });
 
 /* ---------------- TENGEN: chibi sprite traced from the user's reference (src/tengen-sprite.json) + cleavers ---------------- */
 const SPR = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'tengen-sprite.json'), 'utf8'));

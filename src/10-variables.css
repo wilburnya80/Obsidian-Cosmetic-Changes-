@@ -6,24 +6,24 @@
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Nunito:wght@400;600;800&display=swap');
 
-html { background: #0d0720 !important; }
+html { background: #04021a !important; }
 body.theme-dark, body.theme-light {
   --font-text-theme: 'Nunito'; --font-interface-theme: 'Nunito';
-  --background-primary: #170d32; --background-primary-alt: #1f1240; --background-secondary: #110a26; --background-secondary-alt: #190f38;
-  --background-modifier-border: #4a2a7a; --background-modifier-border-hover: #7b4ac0; --background-modifier-hover: rgba(255, 209, 102, 0.10);
-  --background-modifier-form-field: #130a2b; --background-modifier-cover: rgba(10, 5, 24, 0.85);
+  --background-primary: #0a0630; --background-primary-alt: #110a46; --background-secondary: #070424; --background-secondary-alt: #0d0838;
+  --background-modifier-border: #3d2fae; --background-modifier-border-hover: #7a6aff; --background-modifier-hover: rgba(255, 179, 71, 0.10);
+  --background-modifier-form-field: #0a0636; --background-modifier-cover: rgba(10, 5, 24, 0.85);
   --text-normal: #f6eeff; --text-muted: #c0aee6; --text-faint: #8470b0;
-  --text-accent: #ffd166; --text-accent-hover: #ffe8a3; --interactive-accent: #e0245e; --interactive-accent-hover: #ff2d55; --text-on-accent: #ffffff;
-  --interactive-normal: #24154a; --interactive-hover: #331d66;
-  --link-color: #ff9ecb; --link-color-hover: #fff1c1; --link-unresolved-color: #9a86c9; --tag-color: #9bf6ff; --tag-background: rgba(155, 246, 255, 0.10);
-  --h1-color: #ffd166; --h2-color: #ff5c7a; --h3-color: #ff9ecb; --h4-color: #c7a8ff; --h5-color: #6cc4ff; --h6-color: #7dffe0;
-  --bold-color: #fff1c1; --italic-color: #ffd2f5;
-  --table-border-color: #4a2a7a; --table-header-background: rgba(255, 209, 102, 0.10); --blockquote-border-color: #ff2d55;
-  --code-background: #130a2b; --code-normal: #9bf6ff; --hr-color: #4a2a7a;
-  --text-selection: rgba(255, 45, 85, 0.4);
-  --graph-line: rgba(200, 170, 255, 0.22); --graph-node: #c7a8ff; --graph-node-unresolved: #4a2a7a; --graph-node-focused: #ffd166; --graph-node-tag: #ffd166;
-  --scrollbar-bg: transparent; --scrollbar-thumb-bg: #4a2a7a; --scrollbar-active-thumb-bg: #ff2d55;
-  --tg-pane: rgba(20, 11, 44, 0.80); --tg-side: rgba(15, 8, 34, 0.84); --tg-graph: rgba(12, 6, 28, 0.30);
+  --text-accent: #ffb347; --text-accent-hover: #ffd28a; --interactive-accent: #8a2be2; --interactive-accent-hover: #ff4fa0; --text-on-accent: #ffffff;
+  --interactive-normal: #1a1066; --interactive-hover: #2a1a99;
+  --link-color: #ff8ad8; --link-color-hover: #ffe9a8; --link-unresolved-color: #9a86c9; --tag-color: #9bf6ff; --tag-background: rgba(155, 246, 255, 0.10);
+  --h1-color: #ffb347; --h2-color: #ff4fa0; --h3-color: #ff8ad8; --h4-color: #b78bff; --h5-color: #5ea0ff; --h6-color: #6ff3ff;
+  --bold-color: #ffe9a8; --italic-color: #ffd2f5;
+  --table-border-color: #3d2fae; --table-header-background: rgba(255, 179, 71, 0.10); --blockquote-border-color: #ff4fa0;
+  --code-background: #130a2b; --code-normal: #9bf6ff; --hr-color: #3d2fae;
+  --text-selection: rgba(255, 79, 160, 0.4);
+  --graph-line: rgba(200, 170, 255, 0.22); --graph-node: #b78bff; --graph-node-unresolved: #3d2fae; --graph-node-focused: #ffb347; --graph-node-tag: #ffb347;
+  --scrollbar-bg: transparent; --scrollbar-thumb-bg: #3d2fae; --scrollbar-active-thumb-bg: #ff4fa0;
+  --tg-pane: rgba(8, 5, 38, 0.78); --tg-side: rgba(6, 3, 28, 0.84); --tg-graph: rgba(5, 3, 24, 0.30);
   --tg-pixel: 'Pixelify Sans', var(--font-interface-theme), monospace;
   --font-ui-smaller: 13px; --font-ui-small: 14px; --font-ui-medium: 16px; --font-ui-large: 21px;
   --radius-s: 0px; --radius-m: 0px; --radius-l: 0px; --checkbox-radius: 0px;

@@ -12,33 +12,33 @@ body { background: transparent !important; }
 .workspace-leaf-content[data-type="graph"] canvas, .workspace-leaf-content[data-type="localgraph"] canvas { background: transparent !important; filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.9)); }
 /* "no file open": the scene at full brightness */
 .workspace-leaf-content[data-type="empty"] { background-color: transparent !important; }
-.empty-state-title { font-family: var(--tg-pixel); font-size: 2em; color: #ffd166; text-shadow: 3px 3px 0 #1a1426; }
-.empty-state-action { font-family: var(--tg-pixel); color: #ff9ecb; text-shadow: 2px 2px 0 #1a1426; }
+.empty-state-title { font-family: var(--tg-pixel); font-size: 2em; color: #ffb347; text-shadow: 3px 3px 0 #1a1426; }
+.empty-state-action { font-family: var(--tg-pixel); color: #ff8ad8; text-shadow: 2px 2px 0 #1a1426; }
 
 /* pixel UI: no rounding, hard borders, block shadows */
 *, *::before, *::after { border-radius: 0 !important; }
-.status-bar { background: rgba(10, 5, 24, 0.9) !important; border-top: 3px solid #4a2a7a; }
-.workspace-tab-header.is-active { box-shadow: inset 0 -3px 0 #ffd166; }
-.workspace-tab-header.is-active .workspace-tab-header-inner-title { font-family: var(--tg-pixel); color: #ffd166; }
+.status-bar { background: rgba(4, 2, 22, 0.9) !important; border-top: 3px solid #3d2fae; }
+.workspace-tab-header.is-active { box-shadow: inset 0 -3px 0 #ffb347; }
+.workspace-tab-header.is-active .workspace-tab-header-inner-title { font-family: var(--tg-pixel); color: #ffb347; }
 .workspace-tab-header-inner-title, .nav-file-title-content, .nav-folder-title-content { font-family: var(--tg-pixel); letter-spacing: 0.02em; }
 .nav-folder-title { font-weight: 700; }
-.nav-file-title.is-active, .nav-folder-title.is-active { box-shadow: inset 4px 0 0 #ffd166; background: rgba(255, 209, 102, 0.12); }
+.nav-file-title.is-active, .nav-folder-title.is-active { box-shadow: inset 4px 0 0 #ffb347; background: rgba(255, 179, 71, 0.12); }
 button, .clickable-icon { transition: none; }
-button { border: 3px solid #4a2a7a; box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5); font-family: var(--tg-pixel); }
-button:hover { border-color: #ffd166; }
+button { border: 3px solid #3d2fae; box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5); font-family: var(--tg-pixel); }
+button:hover { border-color: #ffb347; }
 button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5); }
-button.mod-cta { background: #e0245e; border-color: #1a1426; color: #fff; }
-button.mod-cta:hover { background: #ff2d55; }
-input[type="text"], input[type="search"], input[type="number"], textarea, select, .dropdown { border: 3px solid #4a2a7a; background: #130a2b; }
-input:focus, textarea:focus { border-color: #ffd166; box-shadow: none; }
-input[type="checkbox"] { border: 2px solid #ffd166; }
-input[type="checkbox"]:checked { background-color: #e0245e; }
+button.mod-cta { background: #8a2be2; border-color: #1a1426; color: #fff; }
+button.mod-cta:hover { background: #ff4fa0; }
+input[type="text"], input[type="search"], input[type="number"], textarea, select, .dropdown { border: 3px solid #3d2fae; background: #0a0636; }
+input:focus, textarea:focus { border-color: #ffb347; box-shadow: none; }
+input[type="checkbox"] { border: 2px solid #ffb347; }
+input[type="checkbox"]:checked { background-color: #8a2be2; }
 ::-webkit-scrollbar { width: 12px; height: 12px; }
-::-webkit-scrollbar-thumb { background: #4a2a7a; border: 2px solid #130a2b; }
-::-webkit-scrollbar-thumb:hover { background: #ff2d55; }
+::-webkit-scrollbar-thumb { background: #3d2fae; border: 2px solid #0a0636; }
+::-webkit-scrollbar-thumb:hover { background: #ff4fa0; }
 
 /* modals, menus, popovers: solid, bordered like RPG dialogue boxes */
-.modal, .menu, .suggestion-container, .popover, .prompt, .notice, .tooltip { background-color: #170d32 !important; border: 3px solid #ffd166 !important; box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.6) !important; }
-.popover .workspace-leaf-content, .popover .view-content, .modal .workspace-leaf-content { background-color: #170d32 !important; }
-.suggestion-item.is-selected, .menu-item:hover { background: rgba(255, 45, 85, 0.3); }
-.graph-controls { background-color: rgba(18, 10, 40, 0.94) !important; border: 3px solid #ffd166 !important; }
+.modal, .menu, .suggestion-container, .popover, .prompt, .notice, .tooltip { background-color: #0a0630 !important; border: 3px solid #ffb347 !important; box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.6) !important; }
+.popover .workspace-leaf-content, .popover .view-content, .modal .workspace-leaf-content { background-color: #0a0630 !important; }
+.suggestion-item.is-selected, .menu-item:hover { background: rgba(255, 79, 160, 0.3); }
+.graph-controls { background-color: rgba(8, 5, 48, 0.94) !important; border: 3px solid #ffb347 !important; }

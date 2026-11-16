@@ -1,3 +1,3 @@
 /* Hide the animated pixel scene (plain pixel UI on solid purple). Use if the animation is too heavy for your machine. */
 body::before { display: none !important; }
-html { background: #170d32 !important; }
+html { background: #0a0630 !important; }
