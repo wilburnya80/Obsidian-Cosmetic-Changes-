@@ -19,7 +19,7 @@ created: 2026-11-16
 - [[Daki's Obi]] — The living obi sashes Daki uses as blades, snares and shields.
 - [[Explosive Grenades]] — Tengen's gunpowder grenades, the loud half of his flashy fighting style.
 - [[Gyutaro's Sickles]] — The sickles Gyutaro throws and wields, coated in his own poison.
-- [[Jeweled Headband]] — Tengen's gold-and-jewel headband, part of his flashy silhouette.
+- [[Jeweled Headband]] — Tengen's gold-and-jewel headband, part of his flashy pixel look.
 - [[Nichirin Blade]] — The sun-forged sword every demon slayer carries.
 - [[Twin Nichirin Cleavers]] — Tengen's two enormous cleaver-like Nichirin swords, joined by a chain.
 

@@ -17,7 +17,7 @@ created: 2026-11-16
 ## All Sources (3)
 
 - [[Anime Season 2]] — The anime season that adapts the Entertainment District Arc.
-- [[Manga]] — The original manga, which this vault's black-and-white light mode imitates.
+- [[Manga]] — The original manga, whose bold black outlines inspire this vault's pixel look.
 - [[Official Fanbook]] — Placeholder source note: where character trivia would be cited.
 
 ## Jump to another hub

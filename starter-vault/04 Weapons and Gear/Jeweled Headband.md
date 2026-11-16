@@ -3,7 +3,7 @@ category: weapons
 tags: [weapons, gear, tengen]
 cssclasses: [cat-weapons]
 aliases: [Headband]
-summary: "Tengen's gold-and-jewel headband, part of his flashy silhouette."
+summary: "Tengen's gold-and-jewel headband, part of his flashy pixel look."
 up: "[[Weapons and Gear Hub]]"
 related: ["[[Tengen Uzui]]", "[[Twin Nichirin Cleavers]]", "[[Flashy]]", "[[Rooftop Fireworks Stand]]"]
 created: 2026-11-16
@@ -12,11 +12,11 @@ created: 2026-11-16
 # Jeweled Headband
 
 > [!weapons] At a glance
-> [[Tengen Uzui|Tengen]]'s gold-and-jewel headband, part of his flashy silhouette.
+> [[Tengen Uzui|Tengen]]'s gold-and-jewel headband, part of his flashy pixel look.
 
 ## Overview
 
-The Jeweled Headband is the ornate gold and gem headband [[Tengen Uzui]] wears, a core part of the silhouette used in this theme. It completes the picture with the [[Twin Nichirin Cleavers]] and expresses his [[Flashy]] philosophy.
+The Jeweled Headband is the ornate gold and gem headband [[Tengen Uzui]] wears, a core part of the chibi pixel look used in this theme. It completes the picture with the [[Twin Nichirin Cleavers]] and expresses his [[Flashy]] philosophy.
 
 ## Key facts
 

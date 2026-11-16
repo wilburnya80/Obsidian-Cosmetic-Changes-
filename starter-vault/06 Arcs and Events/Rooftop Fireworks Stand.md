@@ -16,7 +16,7 @@ created: 2026-11-16
 
 ## Overview
 
-The Rooftop Fireworks Stand is the signature image of this vault and its theme: [[Tengen Uzui]] standing on the peak of the [[Yoshiwara Rooftops]] with both [[Twin Nichirin Cleavers]] drawn, while fireworks burst across the sky behind him. The theme animates exactly that: a silhouette on a roof peak and layers of fireworks, backed by the [[Entertainment District]]'s crimson-and-violet night. It stands for the [[Flashy]] creed and belongs to the [[Entertainment District Arc]].
+The Rooftop Fireworks Stand is the signature image of this vault and its theme: [[Tengen Uzui]] standing on the peak of the [[Yoshiwara Rooftops]] with both [[Twin Nichirin Cleavers]] drawn, while fireworks burst across the sky behind him. The theme animates exactly that: a chibi pixel Tengen on a roof peak, dual-wielding his cleavers, with 84 looping pixel fireworks in a navy-to-electric-blue-and-violet night sky. It stands for the [[Flashy]] creed and belongs to the [[Entertainment District Arc]].
 
 ## Key facts
 
